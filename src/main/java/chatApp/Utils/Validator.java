@@ -15,12 +15,13 @@ public class Validator {
 
 
     public static Optional<Map<String, String>> validateRegister(User user) {
+        errorsMap.clear();
 
         if(! isValidName(user.getFirstName())) {
-            errorsMap.put("first name", getNameConstraints());
+            errorsMap.put("first name", "first name" + getNameConstraints());
         }
         if(! isValidName(user.getLastName())) {
-            errorsMap.put("last name", getNameConstraints());
+            errorsMap.put("last name", "last name" + getNameConstraints());
         }
         if(! isValidEmail(user.getEmail())) {
             errorsMap.put("email", "invalid email");
@@ -57,11 +58,11 @@ public class Validator {
             switch(key) {
                 case "firstName":
                     if(! isValidName(value)) {
-                        errorsMap.put("firstName", getNameConstraints());
+                        errorsMap.put("firstName", "first name" + getNameConstraints());
                     }
                 case "lastName":
                     if(! isValidName(value)) {
-                        errorsMap.put("lastName", getNameConstraints());
+                        errorsMap.put("lastName", "last name" + getNameConstraints());
                     }
                 case "email":
                     if(! isValidEmail(value)) {
@@ -99,27 +100,19 @@ public class Validator {
 
 
     public static boolean isValidPassword(String password) {
-        String regex = "^(?=.*[0-9])" +
-                "(?=.*[a-z])(?=.*[A-Z])" +
-                "(?=.*[@#$%^&+=])" +
-                "(?=\\S+$).{8,20}$";
+        String regex = "^.{5,32}$";
         pattern = Pattern.compile(regex);
         return password != null && pattern.matcher(password).matches();
     }
 
 
     public static String getPasswordConstraints() {
-        return "password must contains at least 8 characters and at most 20 characters." +
-                "At least one digit." +
-                "At least one upper case alphabet." +
-                "At least one lower case alphabet." +
-                "At least one special character which includes !@#$%&*()-+=^." +
-                "no white space.";
+        return "password length must be at least 6 characters long";
     }
 
 
     public static String getNameConstraints() {
-        return "name must contains at least 2 alphabetical letters";
+        return " must contains at least 2 alphabetical letters";
     }
 
 }
