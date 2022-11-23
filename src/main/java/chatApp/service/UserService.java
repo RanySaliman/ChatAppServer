@@ -1,14 +1,10 @@
 package chatApp.service;
 
-import chatApp.Entities.Topic;
 import chatApp.Entities.User;
 import chatApp.repository.UserRepository;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.dao.DuplicateKeyException;
 import org.springframework.stereotype.Service;
 
 import java.sql.SQLDataException;
-import java.util.List;
 
 @Service
 public class UserService {

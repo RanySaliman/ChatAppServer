@@ -2,6 +2,8 @@ package chatApp.Entities;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
+import java.util.Date;
+import java.util.UUID;
 
 @Entity
 public class ConfirmationToken {
@@ -15,7 +17,7 @@ public class ConfirmationToken {
     private String confirmationToken;
 
     @Temporal(TemporalType.TIMESTAMP)
-    private LocalDateTime createdDate;
+    private Date createdDate;
 
     @OneToOne(targetEntity = User.class, fetch = FetchType.EAGER)
     @JoinColumn(nullable = false, name = "user_id")
@@ -27,5 +29,43 @@ public class ConfirmationToken {
         confirmationToken = UUID.randomUUID().toString();
     }
 
-    // getters and setters
+
+    public long getTokenid() {
+        return tokenid;
+    }
+
+
+    public void setTokenid(long tokenid) {
+        this.tokenid = tokenid;
+    }
+
+
+    public String getConfirmationToken() {
+        return confirmationToken;
+    }
+
+
+    public void setConfirmationToken(String confirmationToken) {
+        this.confirmationToken = confirmationToken;
+    }
+
+
+    public Date getCreatedDate() {
+        return createdDate;
+    }
+
+
+    public void setCreatedDate(Date createdDate) {
+        this.createdDate = createdDate;
+    }
+
+
+    public User getUser() {
+        return user;
+    }
+
+
+    public void setUser(User user) {
+        this.user = user;
+    }
 }

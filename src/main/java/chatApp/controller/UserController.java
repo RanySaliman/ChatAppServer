@@ -1,18 +1,13 @@
 package chatApp.controller;
 
-import chatApp.Entities.Message;
-import chatApp.Entities.Topic;
 import chatApp.Entities.User;
-import chatApp.Response.ResponseHandler;
 import chatApp.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.sql.SQLDataException;
-import java.util.List;
 
 @RestController
 @CrossOrigin

@@ -17,9 +17,6 @@ public class Message {
     private LocalDateTime dateTime;
 
     @OneToOne
-    private Topic topic;
-
-    @OneToOne
     private User user;
 
 

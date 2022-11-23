@@ -12,8 +12,8 @@ import java.util.UUID;
 @Table(name = "user")
 public class User {
     @Id
-    @GeneratedValue(generator = "UUID")
-    private UUID id;
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    private Long id;
     private String firstName;
     private String lastName;
     @Column(unique = true)
@@ -63,13 +63,23 @@ public class User {
     }
 
 
-    public UUID getId() {
+    public Long getId() {
         return id;
     }
 
 
-    public void setId(UUID id) {
+    public void setId(Long id) {
         this.id = id;
+    }
+
+
+    public boolean isEnabled() {
+        return isEnabled;
+    }
+
+
+    public void setEnabled(boolean enabled) {
+        isEnabled = enabled;
     }
 
 
