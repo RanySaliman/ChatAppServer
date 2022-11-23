@@ -13,16 +13,14 @@ import java.util.UUID;
 public class User {
     @Id
     @GeneratedValue(generator = "UUID")
-    @GenericGenerator(
-            name = "UUID",
-            strategy = "org.hibernate.id.UUIDGenerator"
-    )
     private UUID id;
     private String firstName;
     private String lastName;
     @Column(unique = true)
     private String email;
     private String password;
+
+    private boolean isEnabled;
 
 
     public String getFirstName() {
