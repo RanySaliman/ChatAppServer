@@ -34,27 +34,21 @@ public class AuthController {
         return authService.createUser(req);
     }
 
-//    @RequestMapping(value = "login", method = RequestMethod.POST)
-//    public ResponseEntity<Object> logIn(@RequestBody User req) {
-//
-//        Optional<Map<String, String>> errors = Validator.validateLogin(req);
-//        if(errors.isPresent()) {
-//            return ResponseHandler.generateErrorResponse(false, HttpStatus.BAD_REQUEST, errors);
-//        }
-//
-//        Optional<User> user = authService.findByEmail(req.getEmail());
-//        if(user.isEmpty()) {
-//            errorsMap.put("email", "could not find a user with this email");
-//            return ResponseHandler.generateErrorResponse(false, HttpStatus.BAD_REQUEST, errorsMap);
-//        }
-//
-//        if(!req.getPassword().equals(user.get().getPassword())){
-//            errorsMap.put("password", "incorrect password");
-//            return ResponseHandler.generateErrorResponse(false, HttpStatus.BAD_REQUEST, errorsMap);
-//        }
-//
-//        Map<String, Object> data = authService.addTokenToUser(user.get());
-//        return ResponseHandler.generateResponse(true, HttpStatus.OK, data);
-//    }
+    @RequestMapping(value="/confirm-account", method= RequestMethod.GET)
+    public String confirmUserAccount(@RequestParam("token")String confirmationToken)
+    {
+        return authService.confirmation(confirmationToken);
+    }
+
+    @RequestMapping(value = "login", method = RequestMethod.POST)
+    public ResponseEntity<Object> logIn(@RequestBody User req) {
+
+        Optional<Map<String, String>> errors = Validator.validateLogin(req);
+        if(errors.isPresent()) {
+            return ResponseHandler.generateErrorResponse(false, HttpStatus.BAD_REQUEST, errors);
+        }
+
+        return authService.login(req);
+    }
 
 }
