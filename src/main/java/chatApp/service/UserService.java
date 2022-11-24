@@ -35,8 +35,8 @@ public class UserService {
         return authService.isAuth(id);
     }
 
-//    public List<User> findByTopic(String name) {
-//        //todo add findByEmail and lastName
-//        return userRepository.findByTopicsName(name);
-//    }
+    public User update(User user) {
+        return userRepository.save(user);
+    }
+
 }
