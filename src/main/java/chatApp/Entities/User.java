@@ -3,10 +3,7 @@ package chatApp.Entities;
 import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.*;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
-import java.util.UUID;
+import java.util.*;
 
 @Entity
 @Table(name = "user")
@@ -21,6 +18,10 @@ public class User {
     private String password;
 
     private boolean isEnabled;
+    private String photoURL;
+    private String nikeName;
+    private Date dateOfBirth;
+    private String bio;
 
 
     public String getFirstName() {
@@ -80,6 +81,46 @@ public class User {
 
     public void setEnabled(boolean enabled) {
         isEnabled = enabled;
+    }
+
+
+    public String getPhotoURL() {
+        return photoURL;
+    }
+
+
+    public void setPhotoURL(String photoURL) {
+        this.photoURL = photoURL;
+    }
+
+
+    public String getNikeName() {
+        return nikeName;
+    }
+
+
+    public void setNikeName(String nikeName) {
+        this.nikeName = nikeName;
+    }
+
+
+    public Date getDateOfBirth() {
+        return dateOfBirth;
+    }
+
+
+    public void setDateOfBirth(Date dateOfBirth) {
+        this.dateOfBirth = dateOfBirth;
+    }
+
+
+    public String getBio() {
+        return bio;
+    }
+
+
+    public void setBio(String bio) {
+        this.bio = bio;
     }
 
 
