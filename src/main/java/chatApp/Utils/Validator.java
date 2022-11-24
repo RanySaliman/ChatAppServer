@@ -10,7 +10,6 @@ import java.util.regex.Pattern;
 
 public class Validator {
 
-    private static Pattern pattern;
     private static final Map<String, String> errorsMap = new HashMap<String, String>();
 
 
@@ -37,6 +36,7 @@ public class Validator {
 
 
     public static Optional<Map<String, String>> validateLogin(User user) {
+        errorsMap.clear();
 
         if(! isValidEmail(user.getEmail())) {
             errorsMap.put("email", "invalid email");
@@ -52,26 +52,32 @@ public class Validator {
 
 
     public static Optional<Map<String, String>> validateFields(Map<String, String> fields) {
+        errorsMap.clear();
 
         fields.forEach((key, value) -> {
-
             switch(key) {
                 case "firstName":
                     if(! isValidName(value)) {
                         errorsMap.put("firstName", "first name" + getNameConstraints());
                     }
+                    break;
                 case "lastName":
                     if(! isValidName(value)) {
                         errorsMap.put("lastName", "last name" + getNameConstraints());
                     }
+                    break;
+
                 case "email":
                     if(! isValidEmail(value)) {
                         errorsMap.put("email", "invalid email");
                     }
-                case "password":
-                    if(! isValidPassword(value)) {
-                        errorsMap.put("password", getPasswordConstraints());
+                    break;
+
+                case "nikeName":
+                    if(! isValidNiceName(value)) {
+                        errorsMap.put("nikeName", getNikeNameConstraints());
                     }
+                    break;
             }
         });
 
@@ -83,8 +89,16 @@ public class Validator {
 
 
     public static boolean isValidName(String name) {
-        String regex = "[A-Za-z]\\w{1,29}$";
-        pattern = Pattern.compile(regex);
+        String regex1 = "^[a-zA-Z]{2,20}$";
+        Pattern pattern = Pattern.compile(regex1);
+
+        return name != null && pattern.matcher(name).matches();
+    }
+
+    public static boolean isValidNiceName(String name) {
+        String regex1 = "^[a-zA-Z0-9_]{2,20}$";
+        Pattern pattern = Pattern.compile(regex1);
+
         return name != null && pattern.matcher(name).matches();
     }
 
@@ -94,14 +108,14 @@ public class Validator {
                 "[a-zA-Z0-9_+&*-]+)*@" +
                 "(?:[a-zA-Z0-9-]+\\.)+[a-z" +
                 "A-Z]{2,7}$";
-        pattern = Pattern.compile(emailRegex);
+        Pattern pattern = Pattern.compile(emailRegex);
         return email != null && pattern.matcher(email).matches();
     }
 
 
     public static boolean isValidPassword(String password) {
         String regex = "^.{5,32}$";
-        pattern = Pattern.compile(regex);
+        Pattern pattern = Pattern.compile(regex);
         return password != null && pattern.matcher(password).matches();
     }
 
@@ -112,7 +126,11 @@ public class Validator {
 
 
     public static String getNameConstraints() {
-        return " must contains at least 2 alphabetical letters";
+        return " must contains at least 2 alphabetical letters and contain only characters";
+    }
+
+    public static String getNikeNameConstraints() {
+        return " must contains at least 2 alphabetical letters and can contain only characters, numbers and underscore";
     }
 
 }

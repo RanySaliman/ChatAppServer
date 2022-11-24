@@ -126,12 +126,12 @@ public class AuthService {
             return ResponseHandler.generateErrorResponse(false, HttpStatus.BAD_REQUEST, responeMap);
         }
 
-        if(!user.get().isEnabled()) {
+        if(! user.get().isEnabled()) {
             responeMap.put("password", "Please Verify Your Email Address");
             return ResponseHandler.generateErrorResponse(false, HttpStatus.BAD_REQUEST, responeMap);
         }
 
-        if(!req.getPassword().equals(user.get().getPassword())){
+        if(! req.getPassword().equals(user.get().getPassword())) {
             responeMap.put("password", "incorrect password");
             return ResponseHandler.generateErrorResponse(false, HttpStatus.BAD_REQUEST, responeMap);
         }
@@ -143,12 +143,14 @@ public class AuthService {
         return ResponseHandler.generateResponse(true, HttpStatus.OK, responeMap);
     }
 
-    public String addTokenToUser(User user){
+
+    public String addTokenToUser(User user) {
         Map<String, Object> dataMap = new HashMap<>();
         String token = createToken();
         tokenId.put(token, user.getId());
         return token;
     }
+
 
     public Optional<User> findByToken(String token) {
         if(tokenId.containsKey(token)) {
@@ -156,6 +158,7 @@ public class AuthService {
         }
         return Optional.empty();
     }
+
 
     public Optional<User> isAuth(int id) {
         if(tokenId.containsValue(id)) {
