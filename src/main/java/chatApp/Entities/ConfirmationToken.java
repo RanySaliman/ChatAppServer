@@ -30,6 +30,10 @@ public class ConfirmationToken {
     }
 
 
+    public ConfirmationToken() {
+    }
+
+
     public long getTokenid() {
         return tokenid;
     }
