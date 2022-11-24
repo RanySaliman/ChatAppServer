@@ -3,19 +3,19 @@ package chatApp.service;
 import chatApp.Entities.User;
 import chatApp.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.dao.DuplicateKeyException;
 import org.springframework.stereotype.Service;
 
 import java.sql.SQLDataException;
+import java.util.Optional;
 
 @Service
 public class UserService {
 
-    private final UserRepository userRepository;
+    @Autowired
+    private UserRepository userRepository;
+    @Autowired
+    private AuthService authService;
 
-    public UserService(UserRepository userRepository) {
-        this.userRepository = userRepository;
-    }
 
 
     /**
@@ -30,4 +30,13 @@ public class UserService {
         }
         return userRepository.save(user);
     }
+
+    public Optional<User> findById(int id) {
+        return authService.isAuth(id);
+    }
+
+//    public List<User> findByTopic(String name) {
+//        //todo add findByEmail and lastName
+//        return userRepository.findByTopicsName(name);
+//    }
 }

@@ -1,7 +1,12 @@
 package chatApp.Entities;
 
+import org.hibernate.annotations.GenericGenerator;
+
 import javax.persistence.*;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
+import java.util.UUID;
 
 @Entity
 @Table(name = "user")
@@ -15,14 +20,7 @@ public class User {
     private String email;
     private String password;
 
-    public int getId() {
-        return id;
-    }
-
-
-    public void setId(int id) {
-        this.id = id;
-    }
+    private boolean isEnabled;
 
 
     public String getFirstName() {
@@ -62,6 +60,26 @@ public class User {
 
     public void setPassword(String password) {
         this.password = password;
+    }
+
+
+    public int getId() {
+        return id;
+    }
+
+
+    public void setId(int id) {
+        this.id = id;
+    }
+
+
+    public boolean isEnabled() {
+        return isEnabled;
+    }
+
+
+    public void setEnabled(boolean enabled) {
+        isEnabled = enabled;
     }
 
 
