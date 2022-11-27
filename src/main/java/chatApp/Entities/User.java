@@ -73,7 +73,7 @@ public class User {
     }
 
 
-    public boolean isEnabled() {
+    public boolean getEnabled() {
         return isEnabled;
     }
 
