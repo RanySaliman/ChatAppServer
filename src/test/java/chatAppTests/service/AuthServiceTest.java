@@ -22,8 +22,6 @@ class AuthServiceTest {
     AuthService authService = new AuthService();
 
     @Autowired
-    private UserRepository userRepository;
-    @Autowired
     ConfirmationTokenRepository confirmationTokenRepository;
     @Autowired
     String confirmationToken;
