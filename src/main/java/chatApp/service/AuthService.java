@@ -126,7 +126,7 @@ public class AuthService {
             return ResponseHandler.generateErrorResponse(false, HttpStatus.BAD_REQUEST, responeMap);
         }
 
-        if(! user.get().isEnabled()) {
+        if(! user.get().getEnabled()) {
             responeMap.put("password", "Please Verify Your Email Address");
             return ResponseHandler.generateErrorResponse(false, HttpStatus.BAD_REQUEST, responeMap);
         }
