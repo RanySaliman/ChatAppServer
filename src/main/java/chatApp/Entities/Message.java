@@ -1,10 +1,7 @@
 package chatApp.Entities;
 
-import com.fasterxml.jackson.annotation.JsonBackReference;
-
 import javax.persistence.*;
 import java.time.LocalDateTime;
-import java.util.*;
 
 @Entity
 @Table(name = "message")
@@ -15,11 +12,6 @@ public class Message {
     private String content;
 
     private LocalDateTime dateTime;
-
-    @OneToOne
-    private User user;
-
-
 
     public int getId() {
         return id;
@@ -41,4 +33,16 @@ public class Message {
     }
 
 
+    public LocalDateTime getDateTime() {
+        return dateTime;
+    }
+
+
+    public void setDateTime(LocalDateTime dateTime) {
+        this.dateTime = dateTime;
+    }
+
+    public int compareTo(Message other) {
+        return this.getDateTime().compareTo(other.getDateTime());
+    }
 }
