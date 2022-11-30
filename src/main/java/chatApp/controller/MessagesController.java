@@ -37,16 +37,28 @@ public class MessagesController {
         messageService.send(chat);
     }
 
+//    @RequestMapping(value = "{chanelType}/{id}", method = RequestMethod.GET)
+//    public ResponseEntity<Object> getPrivateMessage(@PathVariable int id, @PathVariable ChanelType chanelType) {
+//        switch(chanelType) {
+//            case PRIVATE:
+//                return messageService.getPrivateMessages(id, 5);
+//            case PUBLIC:
+//                return messageService.getPublicMessages(3);
+//        }
+//        return null;
+//    }
+
     @RequestMapping(value = "{chanelType}/{id}", method = RequestMethod.GET)
-    public ResponseEntity<Object> getPrivateMessage(@PathVariable int id, @PathVariable ChanelType chanelType) {
+    public ResponseEntity<Object> exportMessages(@PathVariable int id, @PathVariable ChanelType chanelType) {
         switch(chanelType) {
             case PRIVATE:
-                return messageService.getPrivateMessages(id, 120);
+                return messageService.exportMessages(id, 5);
             case PUBLIC:
-                return messageService.getPublicMessages(114);
+                return messageService.exportPublicMessages(id);
         }
         return null;
     }
+
 
 
 }
