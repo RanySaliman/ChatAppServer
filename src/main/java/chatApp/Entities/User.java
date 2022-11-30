@@ -1,6 +1,7 @@
 package chatApp.Entities;
 
-import org.hibernate.annotations.GenericGenerator;
+import chatApp.Utils.Role;
+import chatApp.Utils.Status;
 
 import javax.persistence.*;
 import java.util.*;
@@ -21,8 +22,29 @@ public class User {
     private String nikeName;
     private Date dateOfBirth;
     private String bio;
+    private int role = Role.GUEST.value;
+    private Status status = Status.OFFLINE;
+    private boolean muted = false;
 
+    public boolean isMuted() {
+        return muted;
+    }
 
+    public void setMuted(boolean muted) {
+        this.muted = muted;
+    }
+
+    public int getRole() {
+        return role;
+    }
+
+    public void setRole(int role) {
+        this.role = role;
+    }
+
+    public String getFullName(){
+        return firstName + " " + lastName;
+    }
     public String getFirstName() {
         return firstName;
     }
@@ -122,6 +144,13 @@ public class User {
         this.bio = bio;
     }
 
+    public Status getStatus() {
+        return status;
+    }
+
+    public void setStatus(Status status) {
+        this.status = status;
+    }
 
     @Override
     public boolean equals(Object o) {
