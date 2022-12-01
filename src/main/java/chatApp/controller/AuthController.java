@@ -39,6 +39,7 @@ public class AuthController {
         return authService.confirmation(confirmationToken);
     }
 
+
     @RequestMapping(value = "login", method = RequestMethod.POST)
     public ResponseEntity<Object> logIn(@RequestBody User req) {
 

@@ -5,7 +5,6 @@ import javax.persistence.*;
 @Entity
 @IdClass(CompositeKeyPrivateChat.class)
 public class PrivateChat {
-
     @Id
     private int senderUser;
     @Id
@@ -23,7 +22,6 @@ public class PrivateChat {
 
     public PrivateChat() {
     }
-
 
     public int getSenderUser() {
         return senderUser;

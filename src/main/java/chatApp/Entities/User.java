@@ -3,6 +3,7 @@ package chatApp.Entities;
 import chatApp.Utils.Role;
 import chatApp.Utils.Status;
 
+//import javax.management.relation.Role;
 import javax.persistence.*;
 import java.util.*;
 
@@ -34,6 +35,7 @@ public class User {
         this.muted = muted;
     }
 
+    //<editor-fold desc="Getters and Setters">
     public int getRole() {
         return role;
     }
@@ -48,7 +50,6 @@ public class User {
     public String getFirstName() {
         return firstName;
     }
-
 
     public void setFirstName(String firstName) {
         this.firstName = firstName;
@@ -151,6 +152,7 @@ public class User {
     public void setStatus(Status status) {
         this.status = status;
     }
+    //</editor-fold>
 
     @Override
     public boolean equals(Object o) {
@@ -160,12 +162,10 @@ public class User {
         return id == user.id && Objects.equals(firstName, user.firstName) && Objects.equals(lastName, user.lastName) && Objects.equals(email, user.email) && Objects.equals(password, user.password);
     }
 
-
     @Override
     public int hashCode() {
         return Objects.hash(id, firstName, lastName, email, password);
     }
-
 
     @Override
     public String toString() {
