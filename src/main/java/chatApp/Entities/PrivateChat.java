@@ -14,6 +14,17 @@ public class PrivateChat {
     private int message;
 
 
+    public PrivateChat(int senderUser, int receiverUser, int message) {
+        this.senderUser = senderUser;
+        this.receiverUser = receiverUser;
+        this.message = message;
+    }
+
+
+    public PrivateChat() {
+    }
+
+
     public int getSenderUser() {
         return senderUser;
     }
