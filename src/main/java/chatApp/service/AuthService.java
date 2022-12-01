@@ -71,7 +71,7 @@ public class AuthService {
         SimpleMailMessage mailMessage = new SimpleMailMessage();
         mailMessage.setTo(user1.getEmail());
         mailMessage.setSubject("Complete Registration!");
-        mailMessage.setFrom("omar.ah.2014@gmail.com");
+        mailMessage.setFrom("chatappory@gmail.com");
         mailMessage.setText("Thank you for registering for ChatApp Application.\n"
                 + "This is a verification email, please click the link to verify your email address\n"
                 + "http://localhost:8080/auth/confirm-account?token=" + confirmationToken.getConfirmationToken()
