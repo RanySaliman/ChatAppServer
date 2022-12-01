@@ -8,7 +8,7 @@ public class GroupChats {
     @Id
     private int senderUser;
     @Id
-    private int group;
+    private int groupId;
     @Id
     private int message;
 
@@ -17,9 +17,9 @@ public class GroupChats {
     }
 
 
-    public GroupChats(int senderUser, int group, int message) {
+    public GroupChats(int senderUser, int groupId, int message) {
         this.senderUser = senderUser;
-        this.group = group;
+        this.groupId = groupId;
         this.message = message;
     }
 
@@ -34,13 +34,13 @@ public class GroupChats {
     }
 
 
-    public int getGroup() {
-        return group;
+    public int getGroupId() {
+        return groupId;
     }
 
 
-    public void setGroup(int group) {
-        this.group = group;
+    public void setGroupId(int groupId) {
+        this.groupId = groupId;
     }
 
 
@@ -58,7 +58,7 @@ public class GroupChats {
     public String toString() {
         final StringBuilder sb = new StringBuilder("GroupChats{");
         sb.append("senderUser=").append(senderUser);
-        sb.append(", group=").append(group);
+        sb.append(", groupId=").append(groupId);
         sb.append(", message=").append(message);
         sb.append('}');
         return sb.toString();

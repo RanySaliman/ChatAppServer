@@ -22,7 +22,7 @@ public class ChatController {
     @SendTo("/chatroom/public")
     public MessagePublicChat receiveMessage(@Payload MessagePublicChat message){
         Message messageObj = messageService.create(message.getMessage());
-        Group groupChatByName = messageService.findGroupChatByName(message.getReceiver());
+        PublicGroups groupChatByName = messageService.findGroupChatByName(message.getReceiver());
         messageService.saveGroupChat(new GroupChats(message.getSender().getId(), groupChatByName.getId(), messageObj.getId()));
         return message;
     }

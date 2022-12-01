@@ -3,8 +3,8 @@ package chatApp.Entities;
 import javax.persistence.*;
 
 @Entity
-@Table(name = "group")
-public class Group {
+@Table(name = "publicGroups")
+public class PublicGroups {
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
@@ -13,11 +13,11 @@ public class Group {
     private String groupName;
 
 
-    public Group() {
+    public PublicGroups() {
     }
 
 
-    public Group(int id, String groupName) {
+    public PublicGroups(int id, String groupName) {
         this.id = id;
         this.groupName = groupName;
     }
@@ -45,7 +45,7 @@ public class Group {
 
     @Override
     public String toString() {
-        final StringBuilder sb = new StringBuilder("Group{");
+        final StringBuilder sb = new StringBuilder("PublicGroups{");
         sb.append("id=").append(id);
         sb.append(", groupName='").append(groupName).append('\'');
         sb.append('}');

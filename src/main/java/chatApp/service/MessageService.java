@@ -65,29 +65,37 @@ public class MessageService {
     }
 
 
-    public List<PrivateChat> getMessages(int senderUser, int receiverUser) {
-        responseMap.clear();
+    public ResponseEntity<Object> getPrivateHistoryMessages(int senderUser, int receiverUser) {
+
         List<Map<String, Object>> messages = new ArrayList<>();
-
-
         List<PrivateChat> privateChats = privateChatRepository.findBySenderUserAndReceiverUser(senderUser, receiverUser);
         privateChats.addAll(privateChatRepository.findBySenderUserAndReceiverUser(receiverUser, senderUser));
-
         List<PrivateChat> sortedChats = privateChats.stream().sorted(this::comparePrivateChat).collect(Collectors.toList());
-        return sortedChats;
-    }
 
-
-    public ResponseEntity<Object> getPrivateMessages(int senderUser, int receiverUser) {
-
-        List<Map<String, Object>> messages = new ArrayList<>();
-        List<PrivateChat> privateChats = getMessages(senderUser, receiverUser);
-
-        privateChats.forEach(p -> {
+        sortedChats.forEach(p -> {
             Map<String, Object> formattedMap = new HashMap<>();
             formattedMap.put("sender", userRepository.getUserById(p.getSenderUser()));
             formattedMap.put("receiver", userRepository.getUserById(p.getReceiverUser()));
             formattedMap.put("message", messageRepository.findById(p.getMessage()).getContent());
+            messages.add(formattedMap);
+        });
+
+        return ResponseHandler.generateResponse(true, HttpStatus.OK, messages);
+    }
+
+    public ResponseEntity<Object> getGroupHistoryMessages(int senderUser, int groupId) {
+
+        List<Map<String, Object>> messages = new ArrayList<>();
+        List<Integer> membersIds = groupMembersRepository.findByGroupId(groupId).stream().map(GroupMembers::getUserId).collect(Collectors.toList());
+
+        privateChats.addAll(privateChatRepository.findBySenderUserAndReceiverUser(receiverUser, senderUser));
+        List<PrivateChat> sortedChats = privateChats.stream().sorted(this::comparePrivateChat).collect(Collectors.toList());
+
+        membersIds.forEach(m -> {
+            Map<String, Object> formattedMap = new HashMap<>();
+            formattedMap.put("sender", userRepository.getUserById(m));
+            formattedMap.put("receiver", userRepository.getUserById(m.getReceiverUser()));
+            formattedMap.put("message", messageRepository.findById(m.getMessage()).getContent());
             messages.add(formattedMap);
         });
 
@@ -153,14 +161,15 @@ public class MessageService {
     }
 
 
-    public ResponseEntity<Object> getPublicMessages(int groupId) {
-        List<Integer> membersIds = groupMembersRepository.findByGroupId(groupId).stream().map(GroupMembers::getUserId).collect(Collectors.toList());
+    public ResponseEntity<Object> getPublicMessages(String groupName) {
+        Optional<PublicGroups> byGroupName = groupRepository.findByGroupName(groupName);
+        List<Integer> membersIds = groupMembersRepository.findByGroupId(byGroupName.get().getId()).stream().map(GroupMembers::getUserId).collect(Collectors.toList());
         List<PrivateChat> groupMessages = new ArrayList<>();
         List<Map<String, Object>> messages = new ArrayList<>();
 
 
         membersIds.forEach(m -> {
-            groupMessages.addAll(getMessages(m, groupId));
+            groupMessages.addAll(getMessages(m, groupName));
         });
 
         List<PrivateChat> sortedChats = groupMessages.stream().sorted(this::comparePrivateChat).collect(Collectors.toList());
@@ -178,10 +187,10 @@ public class MessageService {
     }
 
 
-    public Group findGroupChatByName(String groupName) {
-        Optional<Group> group = groupRepository.findByGroupName(groupName);
+    public PublicGroups findGroupChatByName(String groupName) {
+        Optional<PublicGroups> group = groupRepository.findByGroupName(groupName);
         if(group.isEmpty()) {
-            return groupRepository.save(new Group(0, groupName));
+            return groupRepository.save(new PublicGroups(0, groupName));
         }
         return group.get();
     }

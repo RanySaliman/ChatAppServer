@@ -1,7 +1,7 @@
 package chatApp.service;
 
 import chatApp.Entities.ConfirmationToken;
-import chatApp.Entities.Group;
+import chatApp.Entities.PublicGroups;
 import chatApp.Entities.GroupMembers;
 import chatApp.Entities.User;
 import chatApp.Response.ResponseHandler;
@@ -105,7 +105,7 @@ public class AuthService {
                 userRepository.save(user.get());
                 responseMap.put("message", "account Verified");
 
-                Group groupChatByName = messageService.findGroupChatByName("Main Chat");
+                PublicGroups groupChatByName = messageService.findGroupChatByName("Main Chat");
                 groupMembersRepository.save(new GroupMembers(groupChatByName.getId(),user.get().getId()));
 
                 return loginPageOrErrorPage(true);

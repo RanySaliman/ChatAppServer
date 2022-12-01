@@ -8,7 +8,7 @@ public class CompositeKeyGroupChats implements Serializable {
     @Id
     private int senderUser;
     @Id
-    private int group;
+    private int groupId;
     @Id
     private int message;
 }
