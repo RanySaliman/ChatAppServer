@@ -8,7 +8,6 @@ import chatApp.Utils.ChanelType;
 import chatApp.service.AuthService;
 
 import chatApp.service.MessageService;
-import chatApp.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -41,7 +40,7 @@ public class MessagesController {
 
     @RequestMapping(value = "send", method = RequestMethod.POST)
     public void sendMessage(@RequestBody PrivateChat chat) {
-        messageService.send(chat);
+        messageService.savePrivateChat(chat);
     }
 
     @RequestMapping(value = "privateChat", method = RequestMethod.GET)

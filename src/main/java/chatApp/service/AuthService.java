@@ -1,10 +1,13 @@
 package chatApp.service;
 
 import chatApp.Entities.ConfirmationToken;
+import chatApp.Entities.Group;
+import chatApp.Entities.GroupMembers;
 import chatApp.Entities.User;
 import chatApp.Response.ResponseHandler;
 import chatApp.Utils.Role;
 import chatApp.repository.ConfirmationTokenRepository;
+import chatApp.repository.GroupMembersRepository;
 import chatApp.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -31,6 +34,12 @@ public class AuthService {
 
     @Autowired
     private EmailSenderService emailSenderService;
+
+    @Autowired
+    private GroupMembersRepository groupMembersRepository;
+
+    @Autowired
+    private  MessageService messageService;
 
 
     public AuthService() {
@@ -95,6 +104,9 @@ public class AuthService {
                 user.get().setEnabled(true);
                 userRepository.save(user.get());
                 responseMap.put("message", "account Verified");
+
+                Group groupChatByName = messageService.findGroupChatByName("Main Chat");
+                groupMembersRepository.save(new GroupMembers(groupChatByName.getId(),user.get().getId()));
 
                 return loginPageOrErrorPage(true);
             }

@@ -1,15 +1,8 @@
 package chatApp.service;
 
-import chatApp.Entities.GroupMembers;
-import chatApp.Entities.Message;
-import chatApp.Entities.PrivateChat;
-import chatApp.Entities.User;
+import chatApp.Entities.*;
 import chatApp.Response.ResponseHandler;
-import chatApp.repository.GroupMembersRepository;
-import chatApp.repository.MessageRepository;
-import chatApp.repository.PrivateChatRepository;
-import chatApp.repository.UserRepository;
-import com.google.gson.Gson;
+import chatApp.repository.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -17,10 +10,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -36,7 +26,13 @@ public class MessageService {
     private UserRepository userRepository;
 
     @Autowired
+    private GroupChatsRepository groupChatsRepository;
+
+    @Autowired
     private GroupMembersRepository groupMembersRepository;
+
+    @Autowired
+    private GroupRepository groupRepository;
 
     private final Map<String, Object> responseMap = new HashMap<>();
 
@@ -49,8 +45,12 @@ public class MessageService {
     }
 
 
-    public PrivateChat send(PrivateChat chat) {
+    public PrivateChat savePrivateChat(PrivateChat chat) {
         return privateChatRepository.save(chat);
+    }
+
+    public GroupChats saveGroupChat(GroupChats chat) {
+        return groupChatsRepository.save(chat);
     }
 
     public List<User> getPrivateChats(int id){
@@ -175,5 +175,14 @@ public class MessageService {
 
 
         return ResponseHandler.generateResponse(true, HttpStatus.OK, messages);
+    }
+
+
+    public Group findGroupChatByName(String groupName) {
+        Optional<Group> group = groupRepository.findByGroupName(groupName);
+        if(group.isEmpty()) {
+            return groupRepository.save(new Group(0, groupName));
+        }
+        return group.get();
     }
 }
