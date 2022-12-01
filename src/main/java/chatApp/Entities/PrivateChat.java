@@ -13,7 +13,16 @@ public class PrivateChat {
     private int message;
 
 
-    //<editor-fold desc="Getters and Setters">
+    public PrivateChat(int senderUser, int receiverUser, int message) {
+        this.senderUser = senderUser;
+        this.receiverUser = receiverUser;
+        this.message = message;
+    }
+
+
+    public PrivateChat() {
+    }
+
     public int getSenderUser() {
         return senderUser;
     }
@@ -42,7 +51,6 @@ public class PrivateChat {
     public void setMessage(int message) {
         this.message = message;
     }
-    //</editor-fold>
 }
 
 

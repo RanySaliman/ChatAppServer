@@ -4,7 +4,7 @@ import chatApp.Entities.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
-import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -12,7 +12,9 @@ import java.util.UUID;
 
 public interface UserRepository extends JpaRepository<User, Integer> {
         Optional<User> findByEmail(String email);
-
         Optional<User> getUserById(int id);
+        List<User> findByFirstNameStartingWith(String firstName);
+        List<User> findByLastNameStartingWith(String lastName);
+        List<User> findByNikeNameStartingWith(String nikeName);
 
 }

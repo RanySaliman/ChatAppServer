@@ -6,7 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.sql.SQLDataException;
-import java.util.Optional;
+import java.util.*;
 
 @Service
 public class UserService {
@@ -37,6 +37,15 @@ public class UserService {
 
     public User update(User user) {
         return userRepository.save(user);
+    }
+
+    public Set<User> findByQuery(String query) {
+        Set<User> result = new HashSet<User>();
+        result.addAll(userRepository.findByFirstNameStartingWith(query));
+        result.addAll(userRepository.findByLastNameStartingWith(query));
+        result.addAll(userRepository.findByNikeNameStartingWith(query));
+
+        return result;
     }
 
 }
