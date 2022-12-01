@@ -3,6 +3,7 @@ package chatApp.service;
 import chatApp.Entities.ConfirmationToken;
 import chatApp.Entities.User;
 import chatApp.Response.ResponseHandler;
+import chatApp.Utils.Role;
 import chatApp.repository.ConfirmationTokenRepository;
 import chatApp.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,11 +17,13 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.ThreadLocalRandom;
 
+import static chatApp.Utils.Status.*;
+
 @Service
 public class AuthService {
 
     private final Map<String, Integer> tokenId;
-    private final Map<String, Object> responeMap = new HashMap<>();
+    private final Map<String, Object> responseMap = new HashMap<>();
     @Autowired
     private UserRepository userRepository;
     @Autowired
@@ -50,13 +53,15 @@ public class AuthService {
 
 
     public ResponseEntity<Object> createUser(User UserReq) {
-        responeMap.clear();
+        responseMap.clear();
         Optional<User> user = userRepository.findByEmail(UserReq.getEmail());
 
         if(user.isPresent()) {
-            responeMap.put("email", "email already in use");
-            return ResponseHandler.generateErrorResponse(false, HttpStatus.BAD_REQUEST, responeMap);
+            responseMap.put("email", "email already in use");
+            return ResponseHandler.generateErrorResponse(false, HttpStatus.BAD_REQUEST, responseMap);
         }
+
+        UserReq.setRole(Role.USER.value);
 
         User user1 = userRepository.save(UserReq);
         ConfirmationToken confirmationToken = new ConfirmationToken(user1);
@@ -73,15 +78,15 @@ public class AuthService {
                 + "\nThank you...");
         emailSenderService.sendEmail(mailMessage);
 
-        responeMap.put("message", "successful Registration");
-        responeMap.put("data", user1);
+        responseMap.put("message", "successful Registration");
+        responseMap.put("data", user1);
 
         return ResponseHandler.generateResponse(true, HttpStatus.OK, user1);
     }
 
 
     public String confirmation(String confirmationToken) {
-        responeMap.clear();
+        responseMap.clear();
         ConfirmationToken token = confirmationTokenRepository.findByConfirmationToken(confirmationToken);
 
         if(token != null) {
@@ -89,7 +94,7 @@ public class AuthService {
             if(user.isPresent()) {
                 user.get().setEnabled(true);
                 userRepository.save(user.get());
-                responeMap.put("message", "account Verified");
+                responseMap.put("message", "account Verified");
 
                 return loginPageOrErrorPage(true);
             }
@@ -118,31 +123,65 @@ public class AuthService {
 
 
     public ResponseEntity<Object> login(User req) {
-        responeMap.clear();
+        responseMap.clear();
         Optional<User> user = userRepository.findByEmail(req.getEmail());
 
         if(user.isEmpty()) {
-            responeMap.put("email", "could not find a user with this email");
-            return ResponseHandler.generateErrorResponse(false, HttpStatus.BAD_REQUEST, responeMap);
+            responseMap.put("email", "could not find a user with this email");
+            return ResponseHandler.generateErrorResponse(false, HttpStatus.BAD_REQUEST, responseMap);
         }
 
         if(! user.get().getEnabled()) {
-            responeMap.put("password", "Please Verify Your Email Address");
-            return ResponseHandler.generateErrorResponse(false, HttpStatus.BAD_REQUEST, responeMap);
+            responseMap.put("password", "Please Verify Your Email Address");
+            return ResponseHandler.generateErrorResponse(false, HttpStatus.BAD_REQUEST, responseMap);
         }
 
         if(! req.getPassword().equals(user.get().getPassword())) {
-            responeMap.put("password", "incorrect password");
-            return ResponseHandler.generateErrorResponse(false, HttpStatus.BAD_REQUEST, responeMap);
+            responseMap.put("password", "incorrect password");
+            return ResponseHandler.generateErrorResponse(false, HttpStatus.BAD_REQUEST, responseMap);
         }
 
         String token = addTokenToUser(user.get());
-        responeMap.put("data", user);
-        responeMap.put("token", token);
+        responseMap.put("data", user);
+        responseMap.put("token", token);
 
-        return ResponseHandler.generateResponse(true, HttpStatus.OK, responeMap);
+        user.get().setStatus(ONLINE);
+
+        userRepository.save(user.get());
+
+        return ResponseHandler.generateResponse(true, HttpStatus.OK, responseMap);
     }
 
+    public ResponseEntity<Object> loginAsGuest(User req) {
+        responseMap.clear();
+        Optional<User> user = userRepository.findByEmail(req.getEmail());
+
+        if(user.isEmpty()) {
+            responseMap.put("email", "could not find a user with this email");
+            return ResponseHandler.generateErrorResponse(false, HttpStatus.BAD_REQUEST, responseMap);
+        }
+
+        String token = addTokenToUser(user.get());
+        responseMap.put("data", user);
+        responseMap.put("token", token);
+
+        req.setNikeName(req.getEmail() + req.getId());
+
+        return ResponseHandler.generateResponse(true, HttpStatus.OK, responseMap);
+    }
+
+    public ResponseEntity<Object> logout(String  token) {
+
+        Optional<User> user = findByToken(token);
+        if(user.isPresent()&& user.get().getRole()<10){
+            userRepository.delete(user.get());
+        }
+        user.get().setStatus(AWAY);
+        userRepository.save(user.get());
+        tokenId.remove(token);
+
+        return ResponseHandler.generateResponse(true, HttpStatus.OK, null);
+    }
 
     public String addTokenToUser(User user) {
         Map<String, Object> dataMap = new HashMap<>();

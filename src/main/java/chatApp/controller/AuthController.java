@@ -3,6 +3,7 @@ package chatApp.controller;
 
 import chatApp.Entities.User;
 import chatApp.Response.ResponseHandler;
+import chatApp.Utils.Role;
 import chatApp.Utils.Validator;
 import chatApp.service.AuthService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,12 +31,11 @@ public class AuthController {
         if(validationErrors.isPresent()) {
             return ResponseHandler.generateErrorResponse(false, HttpStatus.BAD_REQUEST, validationErrors);
         }
-
         return authService.createUser(req);
     }
 
     @RequestMapping(value="/confirm-account", method= RequestMethod.GET)
-    public String confirmUserAccount(@RequestParam("token")String confirmationToken) {
+    public String confirmUserAccount(@RequestParam("token") String confirmationToken) {
         return authService.confirmation(confirmationToken);
     }
 
@@ -50,5 +50,21 @@ public class AuthController {
         return authService.login(req);
     }
 
+    @RequestMapping(value = "loginGuest", method = RequestMethod.POST)
+    public ResponseEntity<Object> logInAsGuest(@RequestBody User req) {
+
+        Optional<Map<String, String>> errors = Validator.validateLogin(req);
+        if(errors.isPresent()) {
+            return ResponseHandler.generateErrorResponse(false, HttpStatus.BAD_REQUEST, errors);
+        }
+
+        return authService.loginAsGuest(req);
+    }
+
+    @RequestMapping(value = "logout", method = RequestMethod.POST)
+    public ResponseEntity<Object> logout(@RequestHeader String token) {
+
+        return authService.logout(token);
+    }
 
 }

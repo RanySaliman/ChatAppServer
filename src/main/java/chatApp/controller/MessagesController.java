@@ -64,5 +64,15 @@ public class MessagesController {
         return null;
     }
 
+    public ResponseEntity<Object> exportMessages(@PathVariable int id, @PathVariable ChanelType chanelType) {
+        switch(chanelType) {
+            case PRIVATE:
+                return messageService.exportMessages(id, 5);
+            case PUBLIC:
+                return messageService.exportPublicMessages(id);
+        }
+        return null;
+    }
+
 
 }
