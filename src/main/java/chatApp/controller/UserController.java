@@ -13,9 +13,7 @@ import org.springframework.web.server.ResponseStatusException;
 
 import java.lang.reflect.Field;
 import java.sql.SQLDataException;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 
 @RestController
 @CrossOrigin
@@ -66,11 +64,11 @@ public class UserController {
         return ResponseHandler.generateResponse(true, HttpStatus.OK, updatedUser);
     }
 
-    //    @RequestMapping(value = "search", method = RequestMethod.GET)
-    //    public ResponseEntity<Object> search(@RequestParam("query") String query){
-    //        List<User> byQuery = userService.findByQuery(query);
-    //        return ResponseHandler.generateResponse(true, HttpStatus.OK, byQuery);
-    //    }
+        @RequestMapping(value = "search", method = RequestMethod.GET)
+        public ResponseEntity<Object> search(@RequestParam("query") String query){
+            Set<User> byQuery = userService.findByQuery(query);
+            return ResponseHandler.generateResponse(true, HttpStatus.OK, byQuery);
+        }
 
 
 

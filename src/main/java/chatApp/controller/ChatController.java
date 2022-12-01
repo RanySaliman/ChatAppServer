@@ -1,77 +1,41 @@
 package chatApp.controller;
 
+import chatApp.Entities.Message;
+import chatApp.Entities.MessageChat;
+import chatApp.Entities.MessagePublicChat;
+import chatApp.Entities.PrivateChat;
+import chatApp.service.MessageService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.handler.annotation.MessageMapping;
+import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.messaging.handler.annotation.SendTo;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.PathVariable;
 
 @Controller
-@CrossOrigin
 public class ChatController {
-    @MessageMapping("/hello")
-    @SendTo("/topic/mainChat")
-    public ChatMessage greeting(HelloMessage message) throws Exception {
-        return new ChatMessage("SYSTEM", message.getName() + "joined the chat");
-    }
-    @MessageMapping("/plain")
-    @SendTo("/topic/mainChat")
-    public ChatMessage sendPlainMessage(ChatMessage message) {
+
+    @Autowired
+    private SimpMessagingTemplate simpMessagingTemplate;
+
+    @Autowired
+    private MessageService messageService;
+
+    @MessageMapping("/message")
+    @SendTo("/chatroom/public")
+    public MessagePublicChat receiveMessage(@Payload MessagePublicChat message){
+        System.out.println(message.getMessage());
+        Message messageObj = messageService.create(message.getMessage());
+        messageService.send(new PrivateChat(message.getSender().getId(), 114, messageObj.getId()));
         return message;
     }
 
-    @MessageMapping("/sendMessage/{id}")
-    @SendTo("/topic/{id}")
-    public ChatMessage sendMessage(@PathVariable String id, ChatMessage message) {
-        System.out.println(id);
-        System.out.println(message);
+    @MessageMapping("/private-message")
+    public MessageChat recMessage(@Payload MessageChat message){
+        System.out.println(message.getMessage());
+        simpMessagingTemplate.convertAndSendToUser(message.getReceiver().getEmail(),"/private",message);
+        Message messageObj = messageService.create(message.getMessage());
+        messageService.send(new PrivateChat(message.getSender().getId(), message.getReceiver().getId(), messageObj.getId()));
         return message;
     }
-    static class ChatMessage {
-        private String sender;
-        private String content;
-        public ChatMessage() {
-        }
-        public ChatMessage(String sender, String content) {
-            this.sender = sender;
-            this.content = content;
-        }
-        public String getSender() {
-            return sender;
-        }
-        public void setSender(String sender) {
-            this.sender = sender;
-        }
-        public String getContent() {
-            return content;
-        }
-        public void setContent(String content) {
-            this.content = content;
-        }
-        @Override
-        public String toString() {
-            return "ChatMessage{" +
-                    "sender='" + sender + '\'' +
-                    ", content='" + content + '\'' +
-                    '}';
-        }
-    }
-    static class HelloMessage {
-        private String name;
-        public HelloMessage() {
-        }
-        public HelloMessage(String name) {
-            this.name = name;
-        }
-        public String getName() {
-            return name;
-        }
-        @Override
-        public String toString() {
-            return "HelloMessage{" +
-                    "name='" + name + '\'' +
-                    '}';
-        }
-    }
-
 }

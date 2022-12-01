@@ -3,6 +3,7 @@ package chatApp.service;
 import chatApp.Entities.GroupMembers;
 import chatApp.Entities.Message;
 import chatApp.Entities.PrivateChat;
+import chatApp.Entities.User;
 import chatApp.Response.ResponseHandler;
 import chatApp.repository.GroupMembersRepository;
 import chatApp.repository.MessageRepository;
@@ -50,6 +51,17 @@ public class MessageService {
         return privateChatRepository.save(chat);
     }
 
+    public List<User> getPrivateChats(int id){
+        List<Integer> privateChats = privateChatRepository.findPrivateChats(id);
+        List<User> users = new ArrayList<>();
+
+        privateChats.forEach(c -> {
+            users.add(userRepository.findById(c).get());
+        });
+
+        return users;
+    }
+
 
     public List<PrivateChat> getMessages(int senderUser, int receiverUser) {
         responseMap.clear();
@@ -73,7 +85,7 @@ public class MessageService {
             Map<String, Object> formattedMap = new HashMap<>();
             formattedMap.put("sender", userRepository.getUserById(p.getSenderUser()));
             formattedMap.put("receiver", userRepository.getUserById(p.getReceiverUser()));
-            formattedMap.put("message", messageRepository.findById(p.getMessage()));
+            formattedMap.put("message", messageRepository.findById(p.getMessage()).getContent());
             messages.add(formattedMap);
         });
 
@@ -107,7 +119,7 @@ public class MessageService {
             Map<String, Object> formattedMap = new HashMap<>();
             formattedMap.put("sender", userRepository.getUserById(p.getSenderUser()));
             formattedMap.put("receiver", userRepository.getUserById(p.getReceiverUser()));
-            formattedMap.put("message", messageRepository.findById(p.getMessage()));
+            formattedMap.put("message", messageRepository.findById(p.getMessage()).getContent());
             messages.add(formattedMap);
         });
 
