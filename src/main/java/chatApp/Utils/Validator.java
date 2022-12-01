@@ -2,7 +2,7 @@ package chatApp.Utils;
 
 
 import chatApp.Entities.User;
-import chatApp.Utils.UserFields;
+
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
@@ -12,7 +12,11 @@ public class Validator {
 
     private static final Map<String, String> errorsMap = new HashMap<String, String>();
 
-
+    /**
+     * checking that all the registration input is valid
+     * @param user
+     * @return in case of error the user will get an error message
+     */
     public static Optional<Map<String, String>> validateRegister(User user) {
         errorsMap.clear();
 
@@ -34,7 +38,11 @@ public class Validator {
         return Optional.of(errorsMap);
     }
 
-
+    /**
+     * checking that all the login input is valid
+     * @param user
+     * @return in case of error the user will get an error message
+     */
     public static Optional<Map<String, String>> validateLogin(User user) {
         errorsMap.clear();
 
@@ -50,7 +58,11 @@ public class Validator {
         return Optional.of(errorsMap);
     }
 
-
+    /**
+     * validating the fields of register and login 
+     * @param fields
+     * @return will break if there is an error in the input, return true if all input is correct
+     */
     public static Optional<Map<String, String>> validateFields(Map<String, String> fields) {
         errorsMap.clear();
 
@@ -74,7 +86,7 @@ public class Validator {
                     break;
 
                 case "nikeName":
-                    if(! isValidNiceName(value)) {
+                    if(! isValidNickName(value)) {
                         errorsMap.put("nikeName", getNikeNameConstraints());
                     }
                     break;
@@ -88,6 +100,7 @@ public class Validator {
     }
 
 
+    //<editor-fold desc="String validation of input ">
     public static boolean isValidName(String name) {
         String regex1 = "^[a-zA-Z]{2,20}$";
         Pattern pattern = Pattern.compile(regex1);
@@ -95,7 +108,7 @@ public class Validator {
         return name != null && pattern.matcher(name).matches();
     }
 
-    public static boolean isValidNiceName(String name) {
+    public static boolean isValidNickName(String name) {
         String regex1 = "^[a-zA-Z0-9_]{2,20}$";
         Pattern pattern = Pattern.compile(regex1);
 
@@ -118,8 +131,10 @@ public class Validator {
         Pattern pattern = Pattern.compile(regex);
         return password != null && pattern.matcher(password).matches();
     }
+    //</editor-fold>
 
 
+    //<editor-fold desc="Getters of Constraints">
     public static String getPasswordConstraints() {
         return "password length must be at least 6 characters long";
     }
@@ -132,5 +147,6 @@ public class Validator {
     public static String getNikeNameConstraints() {
         return " must contains at least 2 alphabetical letters and can contain only characters, numbers and underscore";
     }
+    //</editor-fold>
 
 }

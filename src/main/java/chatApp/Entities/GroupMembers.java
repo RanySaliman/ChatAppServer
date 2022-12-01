@@ -14,6 +14,7 @@ public class GroupMembers {
     private int userId;
 
 
+    //<editor-fold desc="Getters and Setters">
     public int getGroupId() {
         return groupId;
     }
@@ -32,4 +33,5 @@ public class GroupMembers {
     public void setUserId(int userId) {
         this.userId = userId;
     }
+    //</editor-fold>
 }

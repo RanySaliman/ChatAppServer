@@ -37,7 +37,10 @@ public class AuthService {
         tokenId = new HashMap<>();
     }
 
-
+    /**
+     * creating a token that will be inserted to the mail once the user tries to register
+     * @return a unique token
+     */
     private String createToken() {
         String chars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
         StringBuilder stringBuilder;
@@ -51,7 +54,12 @@ public class AuthService {
         return stringBuilder.toString();
     }
 
-
+    /**
+     * checks that the user isn't in the db and then setting the user as USER type
+     * creates email activation token
+     * @param UserReq
+     * @return sends an activation mail and creats a user in the db
+     */
     public ResponseEntity<Object> createUser(User UserReq) {
         responseMap.clear();
         Optional<User> user = userRepository.findByEmail(UserReq.getEmail());
@@ -84,7 +92,11 @@ public class AuthService {
         return ResponseHandler.generateResponse(true, HttpStatus.OK, user1);
     }
 
-
+    /**
+     * confirms the email token and allowing the user to login the app
+     * @param confirmationToken
+     * @return
+     */
     public String confirmation(String confirmationToken) {
         responseMap.clear();
         ConfirmationToken token = confirmationTokenRepository.findByConfirmationToken(confirmationToken);

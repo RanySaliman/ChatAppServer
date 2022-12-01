@@ -16,6 +16,11 @@ public class EmailSenderService {
         this.javaMailSender = javaMailSender;
     }
 
+    /**
+     * this function will print success message when the email activation is sent
+     * @param email
+     * @return message of success
+     */
     @Async
     public void sendEmail(SimpleMailMessage email) {
         javaMailSender.send(email);

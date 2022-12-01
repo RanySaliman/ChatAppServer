@@ -21,6 +21,11 @@ public class ChatController {
     @Autowired
     private MessageService messageService;
 
+    /**
+     *
+     * @param message
+     * @return
+     */
     @MessageMapping("/message")
     @SendTo("/chatroom/public")
     public MessagePublicChat receiveMessage(@Payload MessagePublicChat message){

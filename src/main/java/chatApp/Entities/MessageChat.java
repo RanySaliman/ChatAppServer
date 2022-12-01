@@ -7,6 +7,7 @@ public class MessageChat {
     private String message;
 
 
+    //<editor-fold desc="Getters and Setters">
     public User getSender() {
         return sender;
     }
@@ -35,6 +36,7 @@ public class MessageChat {
     public void setMessage(String message) {
         this.message = message;
     }
+    //</editor-fold>
 
 
     @Override

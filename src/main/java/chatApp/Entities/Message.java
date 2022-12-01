@@ -13,6 +13,7 @@ public class Message {
 
     private LocalDateTime dateTime;
 
+    //<editor-fold desc="Getters and Setters">
     public int getId() {
         return id;
     }
@@ -41,6 +42,7 @@ public class Message {
     public void setDateTime(LocalDateTime dateTime) {
         this.dateTime = dateTime;
     }
+    //</editor-fold>
 
     public int compareTo(Message other) {
         return this.getDateTime().compareTo(other.getDateTime());

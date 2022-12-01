@@ -34,6 +34,7 @@ public class ConfirmationToken {
     }
 
 
+    //<editor-fold desc="Getters and Setters">
     public long getTokenid() {
         return tokenid;
     }
@@ -72,4 +73,5 @@ public class ConfirmationToken {
     public void setUser(User user) {
         this.user = user;
     }
+    //</editor-fold>
 }

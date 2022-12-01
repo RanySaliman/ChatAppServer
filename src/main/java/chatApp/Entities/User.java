@@ -26,6 +26,7 @@ public class User {
     private Status status = Status.OFFLINE;
     private boolean muted = false;
 
+    //<editor-fold desc="Getters and Setters">
     public boolean isMuted() {
         return muted;
     }
@@ -151,6 +152,7 @@ public class User {
     public void setStatus(Status status) {
         this.status = status;
     }
+    //</editor-fold>
 
     @Override
     public boolean equals(Object o) {
