@@ -5,7 +5,6 @@ import javax.persistence.*;
 @Entity
 @IdClass(CompositeKeyPrivateChat.class)
 public class PrivateChat {
-
     @Id
     private int senderUser;
     @Id
@@ -14,6 +13,7 @@ public class PrivateChat {
     private int message;
 
 
+    //<editor-fold desc="Getters and Setters">
     public int getSenderUser() {
         return senderUser;
     }
@@ -42,6 +42,7 @@ public class PrivateChat {
     public void setMessage(int message) {
         this.message = message;
     }
+    //</editor-fold>
 }
 
 

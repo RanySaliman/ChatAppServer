@@ -3,13 +3,10 @@ package chatApp.controller;
 import chatApp.Entities.Message;
 import chatApp.Entities.PrivateChat;
 import chatApp.Utils.ChanelType;
-import chatApp.repository.PrivateChatRepository;
 import chatApp.service.MessageService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 @RestController
 @CrossOrigin
