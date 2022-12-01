@@ -4,13 +4,14 @@ import chatApp.Entities.Message;
 import chatApp.Entities.PrivateChat;
 import chatApp.Entities.User;
 import chatApp.Utils.ChanelType;
+
 import chatApp.service.AuthService;
+
 import chatApp.service.MessageService;
 import chatApp.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
 import java.util.List;
 import java.util.Optional;
 
