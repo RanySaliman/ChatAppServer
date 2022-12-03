@@ -50,7 +50,7 @@ public class MessagesController {
     }
 
 
-    @RequestMapping(value = "history/{id}", method = RequestMethod.GET)
+    @RequestMapping(value = "history/private/{id}", method = RequestMethod.GET)
     public ResponseEntity<Object> getPrivateMessage(@RequestHeader String token, @PathVariable int id) {
         Optional<User> user = authService.findByToken(token);
         if(user.isPresent()) {
@@ -60,25 +60,25 @@ public class MessagesController {
     }
 
 
-    @RequestMapping(value = "history/{groupName}", method = RequestMethod.GET)
+    @RequestMapping(value = "history/public/{groupName}", method = RequestMethod.GET)
     public ResponseEntity<Object> getGroupMessage(@RequestHeader String token, @PathVariable String groupName) {
         Optional<User> user = authService.findByToken(token);
         if(user.isPresent()) {
-            return messageService.getPublicMessages(groupName);
+            return messageService.getGroupHistoryMessages(groupName);
         }
         return null;
     }
 
 
-    public ResponseEntity<Object> exportMessages(@PathVariable int id, @PathVariable ChanelType chanelType) {
-        switch(chanelType) {
-            case PRIVATE:
-                return messageService.exportMessages(id, 5);
-            case PUBLIC:
-                return messageService.exportPublicMessages(id);
-        }
-        return null;
-    }
+//    public ResponseEntity<Object> exportMessages(@PathVariable int id, @PathVariable ChanelType chanelType) {
+//        switch(chanelType) {
+//            case PRIVATE:
+//                return messageService.exportMessages(id, 5);
+//            case PUBLIC:
+//                return messageService.exportPublicMessages(id);
+//        }
+//        return null;
+//    }
 
 
 }

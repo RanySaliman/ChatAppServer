@@ -43,7 +43,6 @@ public class UserService {
         Set<User> result = new HashSet<User>();
         result.addAll(userRepository.findByFirstNameStartingWith(query));
         result.addAll(userRepository.findByLastNameStartingWith(query));
-        result.addAll(userRepository.findByNikeNameStartingWith(query));
 
         return result;
     }

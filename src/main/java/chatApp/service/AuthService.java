@@ -70,9 +70,9 @@ public class AuthService {
             return ResponseHandler.generateErrorResponse(false, HttpStatus.BAD_REQUEST, responseMap);
         }
 
-        UserReq.setRole(Role.USER.value);
-
+        UserReq.setRole(Role.USER);
         User user1 = userRepository.save(UserReq);
+
         ConfirmationToken confirmationToken = new ConfirmationToken(user1);
 
         confirmationTokenRepository.save(confirmationToken);
@@ -104,9 +104,6 @@ public class AuthService {
                 user.get().setEnabled(true);
                 userRepository.save(user.get());
                 responseMap.put("message", "account Verified");
-
-                PublicGroups groupChatByName = messageService.findGroupChatByName("Main Chat");
-                groupMembersRepository.save(new GroupMembers(groupChatByName.getId(),user.get().getId()));
 
                 return loginPageOrErrorPage(true);
             }
@@ -166,18 +163,20 @@ public class AuthService {
 
     public ResponseEntity<Object> loginAsGuest(User req) {
         responseMap.clear();
-        Optional<User> user = userRepository.findByEmail(req.getEmail());
+//        Optional<User> user = userRepository.findByNikName(req.getNikeName());
 
-        if(user.isEmpty()) {
-            responseMap.put("email", "could not find a user with this email");
-            return ResponseHandler.generateErrorResponse(false, HttpStatus.BAD_REQUEST, responseMap);
-        }
+//        if(user.isEmpty()) {
+//            responseMap.put("email", "could not find a user with this email");
+//            return ResponseHandler.generateErrorResponse(false, HttpStatus.BAD_REQUEST, responseMap);
+//        }
 
-        String token = addTokenToUser(user.get());
-        responseMap.put("data", user);
+        req.setNikeName("Guest-" + req.getNikeName());
+        req.setStatus(ONLINE);
+        User savedUser = userRepository.save(req);
+
+        String token = addTokenToUser(req);
+        responseMap.put("data", savedUser);
         responseMap.put("token", token);
-
-        req.setNikeName(req.getEmail() + req.getId());
 
         return ResponseHandler.generateResponse(true, HttpStatus.OK, responseMap);
     }
@@ -185,10 +184,7 @@ public class AuthService {
     public ResponseEntity<Object> logout(String  token) {
 
         Optional<User> user = findByToken(token);
-        if(user.isPresent()&& user.get().getRole()<10){
-            userRepository.delete(user.get());
-        }
-        user.get().setStatus(AWAY);
+        user.get().setStatus(OFFLINE);
         userRepository.save(user.get());
         tokenId.remove(token);
 
