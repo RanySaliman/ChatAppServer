@@ -23,7 +23,7 @@ public class User {
     private String nikeName;
     private Date dateOfBirth;
     private String bio;
-    private int role = Role.GUEST.value;
+    private Role role = Role.GUEST;
     private Status status = Status.OFFLINE;
     private boolean muted = false;
 
@@ -35,12 +35,11 @@ public class User {
         this.muted = muted;
     }
 
-    //<editor-fold desc="Getters and Setters">
-    public int getRole() {
+    public Role getRole() {
         return role;
     }
 
-    public void setRole(int role) {
+    public void setRole(Role role) {
         this.role = role;
     }
 
@@ -152,7 +151,6 @@ public class User {
     public void setStatus(Status status) {
         this.status = status;
     }
-    //</editor-fold>
 
     @Override
     public boolean equals(Object o) {
@@ -167,6 +165,7 @@ public class User {
         return Objects.hash(id, firstName, lastName, email, password);
     }
 
+
     @Override
     public String toString() {
         final StringBuilder sb = new StringBuilder("User{");
@@ -175,6 +174,14 @@ public class User {
         sb.append(", lastName='").append(lastName).append('\'');
         sb.append(", email='").append(email).append('\'');
         sb.append(", password='").append(password).append('\'');
+        sb.append(", isEnabled=").append(isEnabled);
+        sb.append(", photoURL='").append(photoURL).append('\'');
+        sb.append(", nikeName='").append(nikeName).append('\'');
+        sb.append(", dateOfBirth=").append(dateOfBirth);
+        sb.append(", bio='").append(bio).append('\'');
+        sb.append(", role=").append(role);
+        sb.append(", status=").append(status);
+        sb.append(", muted=").append(muted);
         sb.append('}');
         return sb.toString();
     }

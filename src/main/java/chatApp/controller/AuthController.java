@@ -51,14 +51,13 @@ public class AuthController {
         return authService.login(req);
     }
 
-    @RequestMapping(value = "loginGuest", method = RequestMethod.POST)
+    @RequestMapping(value = "loginAsGuest", method = RequestMethod.POST)
     public ResponseEntity<Object> logInAsGuest(@RequestBody User req) {
 
-        Optional<Map<String, String>> errors = Validator.validateLogin(req);
+        Optional<Map<String, String>> errors = Validator.validateLoginAsGuest(req.getNikeName());
         if(errors.isPresent()) {
             return ResponseHandler.generateErrorResponse(false, HttpStatus.BAD_REQUEST, errors);
         }
-
         return authService.loginAsGuest(req);
     }
 

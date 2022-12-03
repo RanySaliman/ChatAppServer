@@ -50,6 +50,19 @@ public class Validator {
         return Optional.of(errorsMap);
     }
 
+    public static Optional<Map<String, String>> validateLoginAsGuest(String userName) {
+        errorsMap.clear();
+
+        if(! isValidNiceName(userName)) {
+            System.out.println(userName);
+            errorsMap.put("userName", getNikeNameConstraints());
+        }
+        if(errorsMap.isEmpty()) {
+            return Optional.empty();
+        }
+        return Optional.of(errorsMap);
+    }
+
 
     public static Optional<Map<String, String>> validateFields(Map<String, String> fields) {
         errorsMap.clear();
