@@ -14,6 +14,16 @@ public class GroupMembers {
     private int userId;
 
 
+    public GroupMembers() {
+    }
+
+
+    public GroupMembers(int groupId, int userId) {
+        this.groupId = groupId;
+        this.userId = userId;
+    }
+
+
     public int getGroupId() {
         return groupId;
     }
