@@ -1,5 +1,6 @@
 package chatApp.controller;
 
+import chatApp.Entities.GroupMembers;
 import chatApp.Entities.Message;
 import chatApp.Entities.PrivateChat;
 import chatApp.Entities.User;
@@ -69,16 +70,35 @@ public class MessagesController {
         return null;
     }
 
+    @RequestMapping(value = "list/public/{groupName}", method = RequestMethod.GET)
+    public List<User> getGroupMembers(@RequestHeader String token, @PathVariable String groupName) {
+        Optional<User> user = authService.findByToken(token);
+        if(user.isPresent()) {
+            return messageService.getGroupMembers(groupName);
+        }
+        return null;
+    }
 
-//    public ResponseEntity<Object> exportMessages(@PathVariable int id, @PathVariable ChanelType chanelType) {
-//        switch(chanelType) {
-//            case PRIVATE:
-//                return messageService.exportMessages(id, 5);
-//            case PUBLIC:
-//                return messageService.exportPublicMessages(id);
-//        }
-//        return null;
-//    }
+
+    @RequestMapping(value = "export/private/{receiverUser}", method = RequestMethod.GET)
+
+    public String exportPrivateMessages(@RequestHeader String token, @PathVariable int receiverUser) {
+        Optional<User> user = authService.findByToken(token);
+        if(user.isPresent()){
+        return messageService.exportMessages(user.get().getId(), receiverUser);
+        }
+        return null;
+    }
+
+    @RequestMapping(value = "export/public/{groupName}", method = RequestMethod.GET)
+
+    public String exportPublicMessages(@RequestHeader String token, @PathVariable String groupName) {
+        Optional<User> user = authService.findByToken(token);
+        if(user.isPresent()){
+            return messageService.exportPublicMessages(groupName);
+        }
+        return null;
+    }
 
 
 }

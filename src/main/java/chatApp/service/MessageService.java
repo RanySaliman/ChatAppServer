@@ -9,6 +9,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -94,12 +95,12 @@ public class MessageService {
         List<GroupChats> groupMessages = new ArrayList<>();
         List<Integer> membersIds = groupMembersRepository.findByGroupId(groupId).stream().map(GroupMembers::getUserId).collect(Collectors.toList());
 
-        for(int id : membersIds) {
+        for (int id : membersIds) {
             List<GroupChats> messagesToGroup = groupChatsRepository.findBySenderUserAndGroupId(id, groupId);
             groupMessages.addAll(messagesToGroup);
         }
 
-        if(groupMessages.size() > 1) {
+        if (groupMessages.size() > 1) {
             groupMessages = groupMessages.stream().sorted(this::compareGroupChat).collect(Collectors.toList());
         }
 
@@ -114,53 +115,72 @@ public class MessageService {
         return ResponseHandler.generateResponse(true, HttpStatus.OK, messages);
     }
 
-    //
-    //    public ResponseEntity<Object> exportMessages(int senderUser, int receiverUser) {
-    //
-    //        List<Map<String, Object>> messages = new ArrayList<>();
-    //        List<PrivateChat> privateChats = getMessages(senderUser, receiverUser);
-    //
-    //        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
-    //
-    //        privateChats.forEach(p -> {
-    //            Map<String, Object> formattedMap = new HashMap<>();
-    //            formattedMap.put("date", messageRepository.findById(p.getMessage()).getDateTime().format(formatter));
-    //            formattedMap.put("sender", userRepository.getUserById(p.getSenderUser()).map(User::getFullName));
-    //            formattedMap.put("message", messageRepository.findById(p.getMessage()).getContent());
-    //
-    //            messages.add(formattedMap);
-    //        });
-    //
-    //        return ResponseHandler.generateResponse(true, HttpStatus.OK, messages);
-    //    }
-    //
-    //    public ResponseEntity<Object> exportPublicMessages(int groupId) {
-    //
-    //        List<Integer> membersIds = groupMembersRepository.findByGroupId(groupId).stream().map(GroupMembers::getUserId).collect(Collectors.toList());
-    //        List<PrivateChat> groupMessages = new ArrayList<>();
-    //        List<Map<String, Object>> messages = new ArrayList<>();
-    //
-    //
-    //        membersIds.forEach(m -> {
-    //            groupMessages.addAll(getMessages(m, groupId));
-    //        });
-    //
-    //        List<PrivateChat> sortedChats = groupMessages.stream().sorted(this::comparePrivateChat).collect(Collectors.toList());
-    //
-    //        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
-    //
-    //        sortedChats.forEach(p -> {
-    //            Map<String, Object> formattedMap = new HashMap<>();
-    //            formattedMap.put("date", messageRepository.findById(p.getMessage()).getDateTime().format(formatter));
-    //            formattedMap.put("sender", userRepository.getUserById(p.getSenderUser()).map(User::getFullName));
-    //            formattedMap.put("message", messageRepository.findById(p.getMessage()).getContent());
-    //
-    //            messages.add(formattedMap);
-    //        });
-    //
-    //
-    //        return ResponseHandler.generateResponse(true, HttpStatus.OK, messages);
-    //    }
+    public List<User> getGroupMembers(String groupName) {
+
+        Optional<PublicGroups> byGroupName = groupRepository.findByGroupName(groupName);
+        int groupId = byGroupName.get().getId();
+        List<GroupMembers> members = groupMembersRepository.findByGroupId(groupId);
+        members = members.stream().sorted(this::compareGroupMembers).collect(Collectors.toList());
+        List<User> membersAsUsers = new ArrayList<>();
+
+
+        members.forEach(m -> {
+            membersAsUsers.add(userRepository.getUserById(m.getUserId()).get());
+        });
+        return membersAsUsers;
+    }
+
+
+    public String exportMessages(int senderUser, int receiverUser) {
+
+
+        List<Map<String, Object>> messages = new ArrayList<>();
+        List<PrivateChat> privateChats = privateChatRepository.findBySenderUserAndReceiverUser(senderUser, receiverUser);
+        privateChats.addAll(privateChatRepository.findBySenderUserAndReceiverUser(receiverUser, senderUser));
+        List<PrivateChat> sortedChats = privateChats.stream().sorted(this::comparePrivateChat).collect(Collectors.toList());
+
+
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+        String exportedMsg = "";
+        for (PrivateChat p : sortedChats) {
+
+            exportedMsg += "[" + messageRepository.findById(p.getMessage()).getDateTime().format(formatter) + "]";
+            exportedMsg += " " + userRepository.getUserById(p.getSenderUser()).get().getFullName() + ":";
+            exportedMsg += " " + messageRepository.findById(p.getMessage()).getContent() + " \n";
+        }
+
+        return exportedMsg; // need to remove response handlers
+    }
+
+
+    public String exportPublicMessages(String groupName) {
+
+        Optional<PublicGroups> byGroupName = groupRepository.findByGroupName(groupName);
+        int groupId = byGroupName.get().getId();
+
+        List<GroupMembers> members = groupMembersRepository.findByGroupId(groupId);
+        List<Integer> membersIds = groupMembersRepository.findByGroupId(groupId).stream().map(GroupMembers::getUserId).collect(Collectors.toList());
+
+        String exportedGroupChats = "";
+        List<GroupChats> gc = new ArrayList<>();
+        for (int id : membersIds) {
+
+            gc.addAll(groupChatsRepository.findBySenderUserAndGroupId(id, groupId));
+
+        }
+
+        List<GroupChats> sortedGroupChats = gc.stream().sorted(this::compareGroupChat).collect(Collectors.toList());
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+
+        for (GroupChats groupChat : sortedGroupChats) {
+
+            exportedGroupChats += "[" + messageRepository.findById(groupChat.getMessage()).getDateTime().format(formatter) + "]";
+            exportedGroupChats += " " + userRepository.getUserById(groupChat.getSenderUser()).get().getFullName() + ":";
+            exportedGroupChats += " " + messageRepository.findById(groupChat.getMessage()).getContent() + " \n";
+        }
+
+        return exportedGroupChats; // need to remove response handlers
+    }
 
 
     public Message getMessageById(int messageId) {
@@ -175,6 +195,12 @@ public class MessageService {
 
     public int compareGroupChat(GroupChats g1, GroupChats g2) {
         return messageRepository.findById(g1.getMessage()).compareTo(messageRepository.findById(g2.getMessage()));
+    }
+
+    public int compareGroupMembers(GroupMembers m1, GroupMembers m2) {
+        Optional<User> user1 = userRepository.getUserById(m1.getUserId());
+        Optional<User> user2 = userRepository.getUserById(m2.getUserId());
+        return user1.get().getRole().compareTo(user2.get().getRole());
     }
 
 
