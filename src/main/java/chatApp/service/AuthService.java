@@ -1,8 +1,6 @@
 package chatApp.service;
 
 import chatApp.Entities.ConfirmationToken;
-import chatApp.Entities.PublicGroups;
-import chatApp.Entities.GroupMembers;
 import chatApp.Entities.User;
 import chatApp.Response.ResponseHandler;
 import chatApp.Utils.Role;
@@ -140,7 +138,7 @@ public class AuthService {
             return ResponseHandler.generateErrorResponse(false, HttpStatus.BAD_REQUEST, responseMap);
         }
 
-        if(! user.get().getEnabled()) {
+        if(! user.get().isEnabled()) {
             responseMap.put("password", "Please Verify Your Email Address");
             return ResponseHandler.generateErrorResponse(false, HttpStatus.BAD_REQUEST, responseMap);
         }

@@ -123,7 +123,6 @@ public class MessageService {
         members = members.stream().sorted(this::compareGroupMembers).collect(Collectors.toList());
         List<User> membersAsUsers = new ArrayList<>();
 
-
         members.forEach(m -> {
             membersAsUsers.add(userRepository.getUserById(m.getUserId()).get());
         });
@@ -199,6 +198,7 @@ public class MessageService {
     }
 
     public int compareGroupMembers(GroupMembers m1, GroupMembers m2) {
+
         Optional<User> user1 = userRepository.getUserById(m1.getUserId());
         Optional<User> user2 = userRepository.getUserById(m2.getUserId());
         return user2.get().getRole().compareTo(user1.get().getRole());

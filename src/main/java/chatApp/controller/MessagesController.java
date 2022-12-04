@@ -25,12 +25,6 @@ public class MessagesController {
     @Autowired
     private AuthService authService;
 
-    //        @RequestMapping(value = "private/{id}", method = RequestMethod.GET)
-    //        public List<Message> getMessage(@PathVariable int id) {
-    //            List<Message> byUserId = messageRepository.findByUserId(id);
-    //            return byUserId;
-    //        }
-
 
     @RequestMapping(value = "message", method = RequestMethod.POST)
     public Message creteMessage(@RequestBody String content) {
@@ -46,6 +40,7 @@ public class MessagesController {
 
     @RequestMapping(value = "privateChat", method = RequestMethod.GET)
     public List<User> getPrivateChats(@RequestHeader String token) {
+        System.out.println(token);
         Optional<User> user = authService.findByToken(token);
         return messageService.getPrivateChats(user.get().getId());
     }

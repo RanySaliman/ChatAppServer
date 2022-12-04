@@ -1,10 +1,17 @@
 package chatApp.Entities;
 
+import lombok.*;
+
 import javax.persistence.*;
 import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "message")
+@Setter
+@Getter
+@ToString
+@EqualsAndHashCode
+@NoArgsConstructor
 public class Message {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
@@ -12,35 +19,6 @@ public class Message {
     private String content;
 
     private LocalDateTime dateTime;
-
-    public int getId() {
-        return id;
-    }
-
-
-    public void setId(int id) {
-        this.id = id;
-    }
-
-
-    public String getContent() {
-        return content;
-    }
-
-
-    public void setContent(String content) {
-        this.content = content;
-    }
-
-
-    public LocalDateTime getDateTime() {
-        return dateTime;
-    }
-
-
-    public void setDateTime(LocalDateTime dateTime) {
-        this.dateTime = dateTime;
-    }
 
     public int compareTo(Message other) {
         return this.getDateTime().compareTo(other.getDateTime());
