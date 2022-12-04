@@ -3,6 +3,7 @@ package chatApp.controller;
 import chatApp.Entities.User;
 import chatApp.Response.ResponseHandler;
 import chatApp.Utils.Validator;
+import chatApp.service.AuthService;
 import chatApp.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -24,6 +25,9 @@ public class UserController {
 
     @Autowired
     private UserService userService;
+    @Autowired
+    private AuthService authService;
+
     private final Map<String, Object> responeMap = new HashMap<>();
 
     @RequestMapping(value = "{id}", method = RequestMethod.GET)
@@ -72,6 +76,17 @@ public class UserController {
             return ResponseHandler.generateResponse(true, HttpStatus.OK, byQuery);
         }
 
+        @RequestMapping(value = "mute/{id}", method = RequestMethod.GET)
+        public User mutedUser(@RequestHeader String token, @PathVariable int id){
+            Optional<User> user = authService.findByToken(token);
+            if(user.isPresent()) {
+                userService.getUserById(id).get().setMuted(!(userService.getUserById(id).get().isMuted()));
+                return userService.update(userService.getUserById(id).get());
+            }
+
+            return null;
+
+    }
 
 
 }

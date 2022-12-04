@@ -34,6 +34,9 @@ public class UserService {
     public Optional<User> findById(int id) {
         return authService.isAuth(id);
     }
+    public Optional<User> getUserById(int id) {
+        return userRepository.findById(id);
+    }
 
     public User update(User user) {
         return userRepository.save(user);
