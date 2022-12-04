@@ -193,6 +193,7 @@ public class MessageService {
     }
 
 
+
     public int compareGroupChat(GroupChats g1, GroupChats g2) {
         return messageRepository.findById(g1.getMessage()).compareTo(messageRepository.findById(g2.getMessage()));
     }
@@ -200,7 +201,7 @@ public class MessageService {
     public int compareGroupMembers(GroupMembers m1, GroupMembers m2) {
         Optional<User> user1 = userRepository.getUserById(m1.getUserId());
         Optional<User> user2 = userRepository.getUserById(m2.getUserId());
-        return user1.get().getRole().compareTo(user2.get().getRole());
+        return user2.get().getRole().compareTo(user1.get().getRole());
     }
 
 
