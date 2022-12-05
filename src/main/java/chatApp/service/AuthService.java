@@ -5,8 +5,11 @@ import chatApp.Entities.User;
 import chatApp.Response.ResponseHandler;
 import chatApp.Utils.EmailActivationFacade;
 import chatApp.Utils.Role;
+import chatApp.controller.AuthController;
 import chatApp.repository.ConfirmationTokenRepository;
 import chatApp.repository.UserRepository;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -30,6 +33,8 @@ public class AuthService {
     private ConfirmationTokenRepository confirmationTokenRepository;
     @Autowired
     private EmailActivationFacade emailActivationFacade;
+    private static Logger logger = LogManager.getLogger(AuthService.class.getName());
+
 
 
     public AuthService() {
@@ -66,6 +71,7 @@ public class AuthService {
 
         if(user.isPresent()) {
             responseMap.put("email", "email already in use");
+            logger.error(user.get().getEmail() + " already in use");
             return ResponseHandler.generateErrorResponse(false, HttpStatus.BAD_REQUEST, responseMap);
         }
 
@@ -77,6 +83,7 @@ public class AuthService {
 
         emailActivationFacade.sendVerificationEmail(user1.getEmail(), confirmationToken);
 
+        logger.info(user1.getFullName() + " user has been created successfully");
         responseMap.put("message", "successful Registration");
         responseMap.put("data", user1);
 
@@ -98,11 +105,12 @@ public class AuthService {
                 user.get().setEnabled(true);
                 userRepository.save(user.get());
                 responseMap.put("message", "account Verified");
-
+                logger.info(user.get().getFullName() + " account was verified");
                 return loginPageOrErrorPage(true);
             }
 
         }
+        logger.error("email confirmation went wrong");
         return loginPageOrErrorPage(false);
     }
 
@@ -141,16 +149,19 @@ public class AuthService {
 
         if(user.isEmpty()) {
             responseMap.put("email", "could not find a user with this email");
+            logger.error(req.getEmail() + " could not find a user with this email");
             return ResponseHandler.generateErrorResponse(false, HttpStatus.BAD_REQUEST, responseMap);
         }
 
         if(! user.get().isEnabled()) {
             responseMap.put("password", "Please Verify Your Email Address");
+            logger.error(req.getEmail() + " did not verify his email");
             return ResponseHandler.generateErrorResponse(false, HttpStatus.BAD_REQUEST, responseMap);
         }
 
         if(! req.getPassword().equals(user.get().getPassword())) {
             responseMap.put("password", "incorrect password");
+            logger.error("email or password incorrect");
             return ResponseHandler.generateErrorResponse(false, HttpStatus.BAD_REQUEST, responseMap);
         }
 
@@ -159,9 +170,10 @@ public class AuthService {
         responseMap.put("token", token);
 
         user.get().setStatus(ONLINE);
+        logger.info(user.get().getFullName() + " has set status to be Online");
 
         userRepository.save(user.get());
-
+        logger.info(user.get().getFullName() + " has logged in");
         return ResponseHandler.generateResponse(true, HttpStatus.OK, responseMap);
     }
 
@@ -183,11 +195,13 @@ public class AuthService {
 
         req.setNikeName("Guest-" + req.getNikeName());
         req.setStatus(ONLINE);
+        logger.info(req.getNikeName() + " set status to be Online");
         User savedUser = userRepository.save(req);
 
         String token = addTokenToUser(req);
         responseMap.put("data", savedUser);
         responseMap.put("token", token);
+        logger.info(req.getNikeName() + " has logged in");
 
         return ResponseHandler.generateResponse(true, HttpStatus.OK, responseMap);
     }
@@ -201,9 +215,10 @@ public class AuthService {
 
         Optional<User> user = findByToken(token);
         user.get().setStatus(OFFLINE);
+        logger.info(user.get().getFullName() + " status is now offline");
         userRepository.save(user.get());
         tokenId.remove(token);
-
+        logger.info(user.get().getFullName() + " has logged out");
         return ResponseHandler.generateResponse(true, HttpStatus.OK, null);
     }
 

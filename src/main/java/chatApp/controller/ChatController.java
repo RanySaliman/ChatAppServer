@@ -35,7 +35,7 @@ public class ChatController {
      */
     @MessageMapping("/message")
     @SendTo("/chatroom/public")
-    public MessagePublicChat receiveMessage(@Payload MessagePublicChat message){
+    public MessagePublicChat receiveGroupMessage(@Payload MessagePublicChat message){
 
         if(message.getStatus().equals(Status.JOIN)) {
             groupMembersService.joinToGroup(message.getSender().getId(), message.getReceiver());
@@ -54,7 +54,7 @@ public class ChatController {
      * @return message
      */
     @MessageMapping("/private-message")
-    public MessageChat recMessage(@Payload MessageChat message){
+    public MessageChat receivePrivateMessage(@Payload MessageChat message){
         simpMessagingTemplate.convertAndSendToUser(message.getReceiver().getEmail(),"/private",message);
         Message messageObj = messageService.create(message.getMessage());
         chatService.savePrivateChat(new PrivateChat(message.getSender().getId(), message.getReceiver().getId(), messageObj.getId()));

@@ -3,6 +3,8 @@ package chatApp.service;
 import chatApp.Entities.*;
 import chatApp.Response.ResponseHandler;
 import chatApp.repository.*;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -32,6 +34,8 @@ public class ChatService {
     @Autowired
     private GroupRepository groupRepository;
 
+    private static Logger logger = LogManager.getLogger(ChatService.class.getName());
+
 
     /**
      * method that responsible for saving PrivateChat
@@ -39,6 +43,7 @@ public class ChatService {
      * @return PrivateChat
      */
     public PrivateChat savePrivateChat(PrivateChat chat) {
+        logger.info("saving private message in data base");
         return privateChatRepository.save(chat);
     }
 
@@ -48,6 +53,7 @@ public class ChatService {
      * @return GroupChats
      */
     public GroupChats saveGroupChat(GroupChats chat) {
+        logger.info("saving group message in data base");
         return groupChatsRepository.save(chat);
     }
 
@@ -59,6 +65,7 @@ public class ChatService {
      */
     public ResponseEntity<Object> getPrivateHistoryMessages(int senderUser, int receiverUser) {
 
+        logger.info("getting private history messages between user id " + senderUser + " and user id " + receiverUser);
         List<Map<String, Object>> messages = new ArrayList<>();
         List<PrivateChat> privateChats = privateChatRepository.findBySenderUserAndReceiverUser(senderUser, receiverUser);
         privateChats.addAll(privateChatRepository.findBySenderUserAndReceiverUser(receiverUser, senderUser));
@@ -81,6 +88,8 @@ public class ChatService {
      * @return group message history
      */
     public ResponseEntity<Object> getGroupHistoryMessages(String groupName) {
+
+        logger.info("getting group history messages from " + groupName);
 
         Optional<PublicGroups> byGroupName = groupRepository.findByGroupName(groupName);
         int groupId = byGroupName.get().getId();
@@ -116,6 +125,7 @@ public class ChatService {
      */
     public List<User> getGroupMembers(String groupName) {
 
+        logger.info("getting group members list of " + groupName);
         Optional<PublicGroups> byGroupName = groupRepository.findByGroupName(groupName);
         int groupId = byGroupName.get().getId();
         List<GroupMembers> members = groupMembersRepository.findByGroupId(groupId);
@@ -140,7 +150,7 @@ public class ChatService {
      */
     public String exportMessages(int senderUser, int receiverUser) {
 
-
+        logger.info("exporting private messages between user id " + senderUser + " and user id " + receiverUser);
         List<Map<String, Object>> messages = new ArrayList<>();
         List<PrivateChat> privateChats = privateChatRepository.findBySenderUserAndReceiverUser(senderUser, receiverUser);
         privateChats.addAll(privateChatRepository.findBySenderUserAndReceiverUser(receiverUser, senderUser));
@@ -167,6 +177,7 @@ public class ChatService {
      */
     public String exportPublicMessages(String groupName) {
 
+        logger.info("exporting group messages from " + groupName);
         Optional<PublicGroups> byGroupName = groupRepository.findByGroupName(groupName);
         int groupId = byGroupName.get().getId();
 
@@ -217,6 +228,7 @@ public class ChatService {
      * @return positive number if p1 greater then p2 , 0 if p1 equals p2 and -1 if p2 greater then p1
      */
     public int comparePrivateChat(PrivateChat p1, PrivateChat p2) {
+        logger.info("comparing and sorting private messages by date");
         return messageRepository.findById(p1.getMessage()).compareTo(messageRepository.findById(p2.getMessage()));
     }
 
@@ -227,6 +239,7 @@ public class ChatService {
      * @return positive number if g1 greater then g2 , 0 if g1 equals g2 and -1 if g2 greater then g1
      */
     public int compareGroupChat(GroupChats g1, GroupChats g2) {
+        logger.info("comparing and sorting group messages by date");
         return messageRepository.findById(g1.getMessage()).compareTo(messageRepository.findById(g2.getMessage()));
     }
 
@@ -239,6 +252,7 @@ public class ChatService {
      */
     public int compareGroupMembers(GroupMembers m1, GroupMembers m2) {
 
+        logger.info("sorting group members by roles");
         Optional<User> user1 = userRepository.getUserById(m1.getUserId());
         Optional<User> user2 = userRepository.getUserById(m2.getUserId());
         return user2.get().getRole().compareTo(user1.get().getRole());

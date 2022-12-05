@@ -6,6 +6,8 @@ import chatApp.Response.ResponseHandler;
 import chatApp.Utils.Role;
 import chatApp.Utils.Validator;
 import chatApp.service.AuthService;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -23,6 +25,8 @@ public class AuthController {
     @Autowired
     private AuthService authService;
     private final Map<String, Object> errorsMap = new HashMap<>();
+    private static Logger logger = LogManager.getLogger(AuthController.class.getName());
+
 
 
     /**
@@ -33,7 +37,7 @@ public class AuthController {
      */
     @RequestMapping(value = "register", method = RequestMethod.POST)
     public ResponseEntity<Object> register(@RequestBody User req) {
-
+        logger.info("registering with email " +req.getEmail());
         Optional<Map<String, String>> validationErrors = Validator.validateRegister(req);
         if(validationErrors.isPresent()) {
             return ResponseHandler.generateErrorResponse(false, HttpStatus.BAD_REQUEST, validationErrors);
@@ -48,6 +52,7 @@ public class AuthController {
      */
     @RequestMapping(value="/confirm-account", method= RequestMethod.GET)
     public String confirmUserAccount(@RequestParam("token") String confirmationToken) {
+        logger.info("verifying user email with confirmation token " + confirmationToken);
         return authService.confirmation(confirmationToken);
     }
 
@@ -60,7 +65,7 @@ public class AuthController {
      */
     @RequestMapping(value = "login", method = RequestMethod.POST)
     public ResponseEntity<Object> logIn(@RequestBody User req) {
-
+        logger.info("logging into " + req.getEmail());
         Optional<Map<String, String>> errors = Validator.validateLogin(req);
         if(errors.isPresent()) {
             return ResponseHandler.generateErrorResponse(false, HttpStatus.BAD_REQUEST, errors);
@@ -77,7 +82,7 @@ public class AuthController {
      */
     @RequestMapping(value = "loginAsGuest", method = RequestMethod.POST)
     public ResponseEntity<Object> logInAsGuest(@RequestBody User req) {
-
+        logger.info(req .getNikeName() + " guest as logged in");
         Optional<Map<String, String>> errors = Validator.validateLoginAsGuest(req.getNikeName());
         if(errors.isPresent()) {
             return ResponseHandler.generateErrorResponse(false, HttpStatus.BAD_REQUEST, errors);
@@ -93,7 +98,7 @@ public class AuthController {
      */
     @RequestMapping(value = "logout", method = RequestMethod.POST)
     public ResponseEntity<Object> logout(@RequestHeader String token) {
-
+        logger.info("trying to logout using token " + token);
         return authService.logout(token);
     }
 
