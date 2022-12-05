@@ -1,6 +1,7 @@
 package chatApp.controller;
 
 import chatApp.Entities.*;
+import chatApp.service.ChatService;
 import chatApp.service.GroupMembersService;
 import chatApp.service.MessageService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,6 +25,9 @@ public class ChatController {
     @Autowired
     private GroupMembersService groupMembersService;
 
+    @Autowired
+    private ChatService chatService;
+
     @MessageMapping("/message")
     @SendTo("/chatroom/public")
     public MessagePublicChat receiveMessage(@Payload MessagePublicChat message){
@@ -32,8 +36,8 @@ public class ChatController {
             groupMembersService.joinToGroup(message.getSender().getId(), message.getReceiver());
         } else {
             Message messageObj = messageService.create(message.getMessage());
-            Optional<PublicGroups> groupChatByName = messageService.findGroupChatByName(message.getReceiver());
-            messageService.saveGroupChat(new GroupChats(message.getSender().getId(), groupChatByName.get().getId(), messageObj.getId()));
+            Optional<PublicGroups> groupChatByName = chatService.findGroupChatByName(message.getReceiver());
+            chatService.saveGroupChat(new GroupChats(message.getSender().getId(), groupChatByName.get().getId(), messageObj.getId()));
         }
 
         return message;
@@ -43,7 +47,7 @@ public class ChatController {
     public MessageChat recMessage(@Payload MessageChat message){
         simpMessagingTemplate.convertAndSendToUser(message.getReceiver().getEmail(),"/private",message);
         Message messageObj = messageService.create(message.getMessage());
-        messageService.savePrivateChat(new PrivateChat(message.getSender().getId(), message.getReceiver().getId(), messageObj.getId()));
+        chatService.savePrivateChat(new PrivateChat(message.getSender().getId(), message.getReceiver().getId(), messageObj.getId()));
         return message;
     }
 }

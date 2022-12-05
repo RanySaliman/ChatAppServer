@@ -4,18 +4,19 @@ import chatApp.Entities.ConfirmationToken;
 import chatApp.service.EmailSenderService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.mail.SimpleMailMessage;
-import org.springframework.mail.javamail.JavaMailSenderImpl;
 import org.springframework.stereotype.Component;
-import org.springframework.stereotype.Service;
 
-@Service
+@Component
 public class EmailActivationFacade {
-
-
     @Autowired
-    private EmailSenderService emailSenderService = new EmailSenderService(new JavaMailSenderImpl());
+    private EmailSenderService emailSenderService;
 
-    public void sendEmail(String email, ConfirmationToken confirmationToken) {
+    public void sendVerificationEmail(String email, ConfirmationToken confirmationToken) {
+        SimpleMailMessage verificationEmail = createVerificationEmail(email, confirmationToken);
+        emailSenderService.sendEmail(verificationEmail);
+    }
+
+    private SimpleMailMessage createVerificationEmail(String email, ConfirmationToken confirmationToken) {
         SimpleMailMessage mailMessage = new SimpleMailMessage();
         mailMessage.setTo(email);
         mailMessage.setSubject("Complete Registration!");
@@ -24,6 +25,6 @@ public class EmailActivationFacade {
                 + "This is a verification email, please click the link to verify your email address\n"
                 + "http://localhost:8080/auth/confirm-account?token=" + confirmationToken.getConfirmationToken()
                 + "\nThank you...");
-        emailSenderService.sendEmail(mailMessage);
+        return mailMessage;
     }
 }
