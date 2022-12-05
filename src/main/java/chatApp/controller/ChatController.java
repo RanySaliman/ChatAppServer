@@ -28,6 +28,11 @@ public class ChatController {
     @Autowired
     private ChatService chatService;
 
+    /**
+     * end point that responsible for receive and sending messages from/to Main chat
+     * @param message
+     * @return message
+     */
     @MessageMapping("/message")
     @SendTo("/chatroom/public")
     public MessagePublicChat receiveGroupMessage(@Payload MessagePublicChat message){
@@ -43,6 +48,11 @@ public class ChatController {
         return message;
     }
 
+    /**
+     * end point that responsible for receive and sending messages from/to private chats
+     * @param message
+     * @return message
+     */
     @MessageMapping("/private-message")
     public MessageChat receivePrivateMessage(@Payload MessageChat message){
         simpMessagingTemplate.convertAndSendToUser(message.getReceiver().getEmail(),"/private",message);

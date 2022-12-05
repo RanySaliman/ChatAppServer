@@ -42,6 +42,10 @@ public class AuthService {
     }
 
 
+    /**
+     * method that responsible for creating random token without duplicate
+     * @return random token
+     */
     private String createToken() {
         String chars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
         StringBuilder stringBuilder;
@@ -56,9 +60,14 @@ public class AuthService {
     }
 
 
-    public ResponseEntity<Object> createUser(User UserReq) {
+    /**
+     * method that responsible for creating new user if not exits and sending verification email
+     * @param userReq
+     * @return user
+     */
+    public ResponseEntity<Object> createUser(User userReq) {
         responseMap.clear();
-        Optional<User> user = userRepository.findByEmail(UserReq.getEmail());
+        Optional<User> user = userRepository.findByEmail(userReq.getEmail());
 
         if(user.isPresent()) {
             responseMap.put("email", "email already in use");
@@ -66,8 +75,8 @@ public class AuthService {
             return ResponseHandler.generateErrorResponse(false, HttpStatus.BAD_REQUEST, responseMap);
         }
 
-        UserReq.setRole(Role.USER);
-        User user1 = userRepository.save(UserReq);
+        userReq.setRole(Role.USER);
+        User user1 = userRepository.save(userReq);
 
         ConfirmationToken confirmationToken = new ConfirmationToken(user1);
         confirmationTokenRepository.save(confirmationToken);
@@ -81,6 +90,11 @@ public class AuthService {
         return ResponseHandler.generateResponse(true, HttpStatus.OK, user1);
     }
 
+    /**
+     * method that responsible for validate confirmation token
+     * @param confirmationToken
+     * @return if user verified its email , method returns loginPage else ErrorPage
+     */
     public String confirmation(String confirmationToken) {
         responseMap.clear();
         ConfirmationToken token = confirmationTokenRepository.findByConfirmationToken(confirmationToken);
@@ -101,6 +115,11 @@ public class AuthService {
     }
 
 
+    /**
+     * method that responsible for creating html page based on isVerified variable
+     * @param isVerified - if user verified its account isVerified well be true else false
+     * @return html page
+     */
     public String loginPageOrErrorPage(boolean isVerified) {
 
         if(isVerified) {
@@ -118,7 +137,12 @@ public class AuthService {
 
     }
 
-
+    /**
+     * method that responsible for validate user login if there is no errors method create token for this user
+     * @param req - user
+     * @return if there are errors method returns ResponseEntity with relevant status code,
+     *         else returns ResponseEntity with relevant status and data,
+     */
     public ResponseEntity<Object> login(User req) {
         responseMap.clear();
         Optional<User> user = userRepository.findByEmail(req.getEmail());
@@ -153,14 +177,21 @@ public class AuthService {
         return ResponseHandler.generateResponse(true, HttpStatus.OK, responseMap);
     }
 
+    /**
+     * method that responsible for validate guest login if there is no errors method create token for this guest,
+     *        put Guest prefix before its username and changing status to ONLINE
+     * @param req - user
+     * @return if there are errors method returns ResponseEntity with relevant status code,
+     *         else returns ResponseEntity with relevant status and data,
+     */
     public ResponseEntity<Object> loginAsGuest(User req) {
         responseMap.clear();
-//        Optional<User> user = userRepository.findByNikName(req.getNikeName());
+        Optional<User> user = userRepository.findByNikeName("Guest" + req.getNikeName());
 
-//        if(user.isEmpty()) {
-//            responseMap.put("email", "could not find a user with this email");
-//            return ResponseHandler.generateErrorResponse(false, HttpStatus.BAD_REQUEST, responseMap);
-//        }
+        if(user.isEmpty()) {
+            responseMap.put("email", "could not find a user with this email");
+            return ResponseHandler.generateErrorResponse(false, HttpStatus.BAD_REQUEST, responseMap);
+        }
 
         req.setNikeName("Guest-" + req.getNikeName());
         req.setStatus(ONLINE);
@@ -175,6 +206,11 @@ public class AuthService {
         return ResponseHandler.generateResponse(true, HttpStatus.OK, responseMap);
     }
 
+    /**
+     * method that responsible for logout and removing its token and changing status to OFFLINE
+     * @param token
+     * @return  ResponseEntity without data
+     */
     public ResponseEntity<Object> logout(String  token) {
 
         Optional<User> user = findByToken(token);
@@ -186,6 +222,11 @@ public class AuthService {
         return ResponseHandler.generateResponse(true, HttpStatus.OK, null);
     }
 
+    /**
+     * method that responsible for putting in the tokenId map user and token
+     * @param user
+     * @return  token
+     */
     public String addTokenToUser(User user) {
         Map<String, Object> dataMap = new HashMap<>();
         String token = createToken();
@@ -193,7 +234,11 @@ public class AuthService {
         return token;
     }
 
-
+    /**
+     * method that responsible for finding user by token
+     * @param token
+     * @return  user if the token exits
+     */
     public Optional<User> findByToken(String token) {
         if(tokenId.containsKey(token)) {
             return userRepository.getUserById(tokenId.get(token));
@@ -201,7 +246,11 @@ public class AuthService {
         return Optional.empty();
     }
 
-
+    /**
+     * method that responsible for checking if user is authenticated by checking if its id exits in tokenId map
+     * @param id -
+     * @return  user if the token exits
+     */
     public Optional<User> isAuth(int id) {
         if(tokenId.containsValue(id)) {
             return userRepository.getUserById(id);

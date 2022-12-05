@@ -25,7 +25,11 @@ public class MessageService {
     private GroupChatsRepository groupChatsRepository;
     private static Logger logger = LogManager.getLogger(GroupMembersService.class.getName());
 
-
+    /**
+     * method that responsible for creating message obj and save it to DB
+     * @param content -
+     * @return  message
+     */
     public Message create(String content) {
         Message message = new Message();
         message.setContent(content);

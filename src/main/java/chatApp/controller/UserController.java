@@ -2,6 +2,7 @@ package chatApp.controller;
 
 import chatApp.Entities.User;
 import chatApp.Response.ResponseHandler;
+import chatApp.Utils.Role;
 import chatApp.Utils.Validator;
 import chatApp.service.AuthService;
 import chatApp.service.GroupMembersService;
@@ -18,8 +19,7 @@ import java.lang.reflect.Field;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
-import java.sql.SQLDataException;
-import java.util.*;
+import java.util.Set;
 
 @RestController
 @CrossOrigin
@@ -31,68 +31,101 @@ public class UserController {
     @Autowired
     private AuthService authService;
 
-    private final Map<String, Object> responeMap = new HashMap<>();
-
+    private final Map<String, Object> responseMap = new HashMap<>();
     private static Logger logger = LogManager.getLogger(UserController.class.getName());
 
-    @RequestMapping(value = "{id}", method = RequestMethod.GET)
-    public ResponseEntity<Object> getUserById(@PathVariable int id){
-        responeMap.clear();
-        Optional<User> userById = userService.findById(id);
-        logger.info("searching user by id " + id);
-        if(userById.isEmpty()) {
-            responeMap.put("error","there is no user with this id");
-            logger.error("searched for id that doesn't exist - id = " + id);
-            return ResponseHandler.generateErrorResponse(false, HttpStatus.BAD_REQUEST, responeMap);
+
+    /**
+     * end point that responsible for updating user
+     *
+     * @param token
+     * @param fields -> "field":"updated value"...
+     * @return updated user
+     */
+    @RequestMapping(value = "update", method = RequestMethod.PATCH)
+    public ResponseEntity<Object> updateFields(@RequestHeader String token, @RequestBody Map<String, String> fields) {
+        responseMap.clear();
+
+        Optional<User> user = authService.findByToken(token);
+        if(user.isPresent()) {
+            logger.info("updating field for user  " + user.get().getFullName());
+            Optional<Map<String, String>> validationErrors = Validator.validateFields(fields);
+            if(validationErrors.isPresent()) {
+                return ResponseHandler.generateErrorResponse(false, HttpStatus.BAD_REQUEST, validationErrors);
+            }
+            fields.forEach((key, value) -> {
+
+                Field field = ReflectionUtils.findField(User.class, key);
+                field.setAccessible(true);
+                ReflectionUtils.setField(field, user.get(), value);
+            });
+            User updatedUser = userService.update(user.get());
+            return ResponseHandler.generateResponse(true, HttpStatus.OK, updatedUser);
         }
 
-        responeMap.put("data",userById.get());
-        return ResponseHandler.generateResponse(true, HttpStatus.OK, responeMap);
+        responseMap.put("error", "invalid token");
+        logger.error("tried to update field with invalid token");
+        return ResponseHandler.generateErrorResponse(false, HttpStatus.BAD_REQUEST, responseMap);
     }
 
-    @RequestMapping(value = "update/{id}", method = RequestMethod.PATCH)
-    public ResponseEntity<Object> updateFields(@PathVariable int id, @RequestBody Map<String, String> fields) {
-        System.out.println(fields);
-        logger.info("updating field for user with id " + id);
-        Optional<Map<String, String>> validationErrors = Validator.validateFields(fields);
-        if(validationErrors.isPresent()) {
-            return ResponseHandler.generateErrorResponse(false, HttpStatus.BAD_REQUEST, validationErrors);
-        }
-        System.out.println(id);
-        Optional<User> userById = userService.findById(id);
 
-        if(userById.isEmpty()) {
-            responeMap.put("error","there is no user with this id");
-            logger.error("tried to update field for user with non existing id. id = " + id);
-            return ResponseHandler.generateErrorResponse(false, HttpStatus.BAD_REQUEST, responeMap);
-        }
+    /**
+     * end point that responsible for searching users by query
+     *
+     * @param token
+     * @param query
+     * @return search results
+     */
+    @RequestMapping(value = "search", method = RequestMethod.GET)
+    public ResponseEntity<Object> search(@RequestHeader String token, @RequestParam("query") String query) {
+        responseMap.clear();
 
-        fields.forEach((key, value) -> {
-
-            Field field = ReflectionUtils.findField(User.class, key);
-            field.setAccessible(true);
-            ReflectionUtils.setField(field, userById.get(), value);
-        });
-        User updatedUser = userService.update(userById.get());
-        return ResponseHandler.generateResponse(true, HttpStatus.OK, updatedUser);
-    }
-
-        @RequestMapping(value = "search", method = RequestMethod.GET)
-        public ResponseEntity<Object> search(@RequestParam("query") String query){
+        Optional<User> user = authService.findByToken(token);
+        if(user.isPresent()) {
+            logger.info("searching user  " + user.get().getFullName());
             Set<User> byQuery = userService.findByQuery(query);
             return ResponseHandler.generateResponse(true, HttpStatus.OK, byQuery);
         }
+        responseMap.put("error", "invalid token");
+        logger.error("token invalid");
+        return ResponseHandler.generateErrorResponse(false, HttpStatus.BAD_REQUEST, responseMap);
+    }
 
-        @RequestMapping(value = "mute/{id}", method = RequestMethod.GET)
-        public User mutedUser(@RequestHeader String token, @PathVariable int id){
-            Optional<User> user = authService.findByToken(token);
+    /**
+     * end point that responsible for mute user by Admin in Main chat
+     *
+     * @param token
+     * @param id
+     * @return user after changing muted status
+     */
+    @RequestMapping(value = "mute/{id}", method = RequestMethod.GET)
+    public ResponseEntity<Object> mutedUser(@RequestHeader String token, @PathVariable int id) {
+        responseMap.clear();
+
+        Optional<User> user = authService.findByToken(token);
+        if(user.isPresent()) {
             logger.info("trying to mute user " + user.get().getFullName());
-            if(user.isPresent()) {
-                userService.getUserById(id).get().setMuted(!(userService.getUserById(id).get().isMuted()));
-                return userService.update(userService.getUserById(id).get());
+            if(user.get().getRole().equals(Role.ADMIN)) {
+                Optional<User> userById = userService.getUserById(id);
+                if(userById.isPresent()) {
+                    userById.get().setMuted(!userById.get().isMuted());
+                    User updatedUser = userService.update(userById.get());
+                    return ResponseHandler.generateResponse(true, HttpStatus.OK, updatedUser);
+                } else {
+                    responseMap.put("error", "invalid id");
+                    logger.error("invalid id for muted user");
+                    return ResponseHandler.generateErrorResponse(false, HttpStatus.BAD_REQUEST, responseMap);
+                }
+            } else {
+                responseMap.put("error", "permission denied");
+                logger.error("permission denied for muting a user");
+                return ResponseHandler.generateErrorResponse(false, HttpStatus.BAD_REQUEST, responseMap);
             }
 
-            return null;
+        }
+
+        responseMap.put("error", "invalid token");
+        return ResponseHandler.generateErrorResponse(false, HttpStatus.BAD_REQUEST, responseMap);
 
     }
 

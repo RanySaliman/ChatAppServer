@@ -16,32 +16,31 @@ public class UserService {
     @Autowired
     private AuthService authService;
 
-
-
     /**
-     * Adds a user to the database if it has a unique email
-     * @param user - the user's data
-     * @return a saved user with it's generated id
-     * @throws SQLDataException when the provided email already exists
+     * method that responsible for finding user by id
+     * @param id -
+     * @return  user if exits
      */
-    public User addUser(User user) throws SQLDataException {
-        if(userRepository.findByEmail(user.getEmail()).isPresent()){
-            throw new SQLDataException(String.format("Email %s exists in users table", user.getEmail()));
-        }
-        return userRepository.save(user);
-    }
-
-    public Optional<User> findById(int id) {
-        return authService.isAuth(id);
-    }
     public Optional<User> getUserById(int id) {
         return userRepository.findById(id);
     }
 
+
+    /**
+     * method that responsible for updating user , if user exits user repository updated him with new data
+     *                                             else user repository create new user with new data
+     * @param user -
+     * @return  user
+     */
     public User update(User user) {
         return userRepository.save(user);
     }
 
+    /**
+     * method that responsible for finding user by matching query
+     * @param query -
+     * @return  set of users
+     */
     public Set<User> findByQuery(String query) {
         Set<User> result = new HashSet<User>();
         result.addAll(userRepository.findByFirstNameStartingWith(query));

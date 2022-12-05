@@ -28,6 +28,13 @@ public class AuthController {
     private static Logger logger = LogManager.getLogger(AuthController.class.getName());
 
 
+
+    /**
+     * end point that responsible to create user if he not exists
+     * @param req -> User
+     * @return if there are errors method returns ResponseEntity with relevant status code,
+     *         else returns ResponseEntity with relevant status data,
+     */
     @RequestMapping(value = "register", method = RequestMethod.POST)
     public ResponseEntity<Object> register(@RequestBody User req) {
         logger.info("registering with email " +req.getEmail());
@@ -38,6 +45,11 @@ public class AuthController {
         return authService.createUser(req);
     }
 
+    /**
+     * end point that responsible for confirm account
+     * @param confirmationToken
+     * @return
+     */
     @RequestMapping(value="/confirm-account", method= RequestMethod.GET)
     public String confirmUserAccount(@RequestParam("token") String confirmationToken) {
         logger.info("verifying user email with confirmation token " + confirmationToken);
@@ -45,6 +57,12 @@ public class AuthController {
     }
 
 
+    /**
+     * end point that responsible to login
+     * @param req -> User
+     * @return if there are errors method returns ResponseEntity with relevant status code,
+     *         else returns ResponseEntity with relevant status data,
+     */
     @RequestMapping(value = "login", method = RequestMethod.POST)
     public ResponseEntity<Object> logIn(@RequestBody User req) {
         logger.info("logging into " + req.getEmail());
@@ -56,6 +74,12 @@ public class AuthController {
         return authService.login(req);
     }
 
+    /**
+     * end point that responsible for guset login
+     * @param req -> User
+     * @return if there are errors method returns ResponseEntity with relevant status code,
+     *         else returns ResponseEntity with relevant status data,
+     */
     @RequestMapping(value = "loginAsGuest", method = RequestMethod.POST)
     public ResponseEntity<Object> logInAsGuest(@RequestBody User req) {
         logger.info(req .getNikeName() + " guest as logged in");
@@ -66,6 +90,12 @@ public class AuthController {
         return authService.loginAsGuest(req);
     }
 
+    /**
+     * end point that responsible for logout
+     * @param token
+     * @return if there are errors method returns ResponseEntity with relevant status code,
+     *         else returns ResponseEntity with relevant status data,
+     */
     @RequestMapping(value = "logout", method = RequestMethod.POST)
     public ResponseEntity<Object> logout(@RequestHeader String token) {
         logger.info("trying to out using token " + token);

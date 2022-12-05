@@ -22,12 +22,22 @@ public class GroupMembersService {
 
     private static Logger logger = LogManager.getLogger(GroupMembersService.class.getName());
 
+    /**
+     * method that responsible for adding a user to group
+     * @param userId -
+     * @param groupName -
+     */
     public void joinToGroup(int userId, String groupName) {
         PublicGroups groupChatByName = findGroupChatByName(groupName);
         groupMembersRepository.save(new GroupMembers(groupChatByName.getId(), userId));
         logger.info("user with id " + userId + " joined the group " + groupName);
     }
 
+    /**
+     * method that responsible for finding group by group name
+     * @param groupName -
+     * @return  group if exits
+     */
     public PublicGroups findGroupChatByName(String groupName) {
         Optional<PublicGroups> group = groupRepository.findByGroupName(groupName);
         logger.info("searching group " + groupName);
