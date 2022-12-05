@@ -5,7 +5,11 @@ import chatApp.Entities.Message;
 import chatApp.Entities.PrivateChat;
 import chatApp.Entities.User;
 import chatApp.Utils.ChanelType;
+import chatApp.repository.GroupChatsRepository;
+import chatApp.repository.GroupMembersRepository;
+import chatApp.repository.GroupRepository;
 import chatApp.service.AuthService;
+import chatApp.service.ChatService;
 import chatApp.service.MessageService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -25,11 +29,8 @@ public class MessagesController {
     @Autowired
     private AuthService authService;
 
-    //        @RequestMapping(value = "private/{id}", method = RequestMethod.GET)
-    //        public List<Message> getMessage(@PathVariable int id) {
-    //            List<Message> byUserId = messageRepository.findByUserId(id);
-    //            return byUserId;
-    //        }
+    @Autowired
+    private ChatService chatService;
 
 
     @RequestMapping(value = "message", method = RequestMethod.POST)
@@ -40,14 +41,14 @@ public class MessagesController {
 
     @RequestMapping(value = "send", method = RequestMethod.POST)
     public void sendMessage(@RequestBody PrivateChat chat) {
-        messageService.savePrivateChat(chat);
+        chatService.savePrivateChat(chat);
     }
 
 
     @RequestMapping(value = "privateChat", method = RequestMethod.GET)
     public List<User> getPrivateChats(@RequestHeader String token) {
         Optional<User> user = authService.findByToken(token);
-        return messageService.getPrivateChats(user.get().getId());
+        return chatService.getPrivateChats(user.get().getId());
     }
 
 
@@ -55,7 +56,7 @@ public class MessagesController {
     public ResponseEntity<Object> getPrivateMessage(@RequestHeader String token, @PathVariable int id) {
         Optional<User> user = authService.findByToken(token);
         if(user.isPresent()) {
-            return messageService.getPrivateHistoryMessages(user.get().getId(), id);
+            return chatService.getPrivateHistoryMessages(user.get().getId(), id);
         }
         return null;
     }
@@ -65,7 +66,7 @@ public class MessagesController {
     public ResponseEntity<Object> getGroupMessage(@RequestHeader String token, @PathVariable String groupName) {
         Optional<User> user = authService.findByToken(token);
         if(user.isPresent()) {
-            return messageService.getGroupHistoryMessages(groupName);
+            return chatService.getGroupHistoryMessages(groupName);
         }
         return null;
     }
@@ -74,7 +75,7 @@ public class MessagesController {
     public List<User> getGroupMembers(@RequestHeader String token, @PathVariable String groupName) {
         Optional<User> user = authService.findByToken(token);
         if(user.isPresent()) {
-            return messageService.getGroupMembers(groupName);
+            return chatService.getGroupMembers(groupName);
         }
         return null;
     }
@@ -85,7 +86,7 @@ public class MessagesController {
     public String exportPrivateMessages(@RequestHeader String token, @PathVariable int receiverUser) {
         Optional<User> user = authService.findByToken(token);
         if(user.isPresent()){
-        return messageService.exportMessages(user.get().getId(), receiverUser);
+        return chatService.exportMessages(user.get().getId(), receiverUser);
         }
         return null;
     }
@@ -95,10 +96,9 @@ public class MessagesController {
     public String exportPublicMessages(@RequestHeader String token, @PathVariable String groupName) {
         Optional<User> user = authService.findByToken(token);
         if(user.isPresent()){
-            return messageService.exportPublicMessages(groupName);
+            return chatService.exportPublicMessages(groupName);
         }
         return null;
     }
-
 
 }

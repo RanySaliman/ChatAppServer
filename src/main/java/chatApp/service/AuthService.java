@@ -1,18 +1,15 @@
 package chatApp.service;
 
 import chatApp.Entities.ConfirmationToken;
-import chatApp.Entities.PublicGroups;
-import chatApp.Entities.GroupMembers;
 import chatApp.Entities.User;
 import chatApp.Response.ResponseHandler;
+import chatApp.Utils.EmailActivationFacade;
 import chatApp.Utils.Role;
 import chatApp.repository.ConfirmationTokenRepository;
-import chatApp.repository.GroupMembersRepository;
 import chatApp.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.mail.SimpleMailMessage;
 import org.springframework.stereotype.Service;
 
 import java.util.HashMap;
@@ -31,15 +28,8 @@ public class AuthService {
     private UserRepository userRepository;
     @Autowired
     private ConfirmationTokenRepository confirmationTokenRepository;
-
     @Autowired
-    private EmailSenderService emailSenderService;
-
-    @Autowired
-    private GroupMembersRepository groupMembersRepository;
-
-    @Autowired
-    private  MessageService messageService;
+    private EmailActivationFacade emailActivationFacade;
 
 
     public AuthService() {
@@ -74,25 +64,15 @@ public class AuthService {
         User user1 = userRepository.save(UserReq);
 
         ConfirmationToken confirmationToken = new ConfirmationToken(user1);
-
         confirmationTokenRepository.save(confirmationToken);
 
-        SimpleMailMessage mailMessage = new SimpleMailMessage();
-        mailMessage.setTo(user1.getEmail());
-        mailMessage.setSubject("Complete Registration!");
-        mailMessage.setFrom("chatappory@gmail.com");
-        mailMessage.setText("Thank you for registering to the ChatApp Application.\n"
-                + "This is a verification email, please click the link to verify your email address\n"
-                + "http://localhost:8080/auth/confirm-account?token=" + confirmationToken.getConfirmationToken()
-                + "\nThank you...");
-        emailSenderService.sendEmail(mailMessage);
+        emailActivationFacade.sendVerificationEmail(user1.getEmail(), confirmationToken);
 
         responseMap.put("message", "successful Registration");
         responseMap.put("data", user1);
 
         return ResponseHandler.generateResponse(true, HttpStatus.OK, user1);
     }
-
 
     public String confirmation(String confirmationToken) {
         responseMap.clear();
@@ -140,7 +120,7 @@ public class AuthService {
             return ResponseHandler.generateErrorResponse(false, HttpStatus.BAD_REQUEST, responseMap);
         }
 
-        if(! user.get().getEnabled()) {
+        if(! user.get().isEnabled()) {
             responseMap.put("password", "Please Verify Your Email Address");
             return ResponseHandler.generateErrorResponse(false, HttpStatus.BAD_REQUEST, responseMap);
         }
