@@ -43,7 +43,7 @@ class UserTest {
     @Test
     void setIsEnabled_nameIsValid_isEquals() {
         user.setEnabled(true);
-        assertEquals(user.getEnabled(), true, "Expected equal name");
+        assertEquals(user.isEnabled(), true, "Expected equal name");
     }
 
     @Test
