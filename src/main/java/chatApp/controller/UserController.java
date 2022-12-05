@@ -82,7 +82,7 @@ public class UserController {
 
         Optional<User> user = authService.findByToken(token);
         if(user.isPresent()) {
-            logger.info("searching user  " + user.get().getFullName());
+            logger.info("searching users starts with " + query);
             Set<User> byQuery = userService.findByQuery(query);
             return ResponseHandler.generateResponse(true, HttpStatus.OK, byQuery);
         }

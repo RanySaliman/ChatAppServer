@@ -98,7 +98,7 @@ public class AuthController {
      */
     @RequestMapping(value = "logout", method = RequestMethod.POST)
     public ResponseEntity<Object> logout(@RequestHeader String token) {
-        logger.info("trying to out using token " + token);
+        logger.info("trying to logout using token " + token);
         return authService.logout(token);
     }
 
