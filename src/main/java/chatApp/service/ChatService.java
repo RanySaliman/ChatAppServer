@@ -33,14 +33,30 @@ public class ChatService {
     private GroupRepository groupRepository;
 
 
+    /**
+     * method that responsible for saving PrivateChat
+     * @param chat
+     * @return PrivateChat
+     */
     public PrivateChat savePrivateChat(PrivateChat chat) {
         return privateChatRepository.save(chat);
     }
 
+    /**
+     * method that responsible for saving GroupChats
+     * @param chat
+     * @return GroupChats
+     */
     public GroupChats saveGroupChat(GroupChats chat) {
         return groupChatsRepository.save(chat);
     }
 
+    /**
+     * method that responsible for fetching message history between senderUser and receiverUser
+     * @param senderUser
+     * @param receiverUser
+     * @return message history
+     */
     public ResponseEntity<Object> getPrivateHistoryMessages(int senderUser, int receiverUser) {
 
         List<Map<String, Object>> messages = new ArrayList<>();
@@ -59,6 +75,11 @@ public class ChatService {
         return ResponseHandler.generateResponse(true, HttpStatus.OK, messages);
     }
 
+    /**
+     * method that responsible for fetching message group history
+     * @param groupName -
+     * @return group message history
+     */
     public ResponseEntity<Object> getGroupHistoryMessages(String groupName) {
 
         Optional<PublicGroups> byGroupName = groupRepository.findByGroupName(groupName);
@@ -88,6 +109,11 @@ public class ChatService {
         return ResponseHandler.generateResponse(true, HttpStatus.OK, messages);
     }
 
+    /**
+     * method that responsible for fetching group members
+     * @param groupName
+     * @return group members
+     */
     public List<User> getGroupMembers(String groupName) {
 
         Optional<PublicGroups> byGroupName = groupRepository.findByGroupName(groupName);
@@ -106,6 +132,12 @@ public class ChatService {
         return membersAsUsers;
     }
 
+    /**
+     * method that responsible for exports private chat between senderUser and receiverUser
+     * @param receiverUser
+     * @param senderUser
+     * @return string that contains all formatted messages
+     */
     public String exportMessages(int senderUser, int receiverUser) {
 
 
@@ -116,17 +148,23 @@ public class ChatService {
 
 
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
-        String exportedMsg = "";
+
+        StringBuilder exportedMsg = new StringBuilder();
         for (PrivateChat p : sortedChats) {
 
-            exportedMsg += "[" + messageRepository.findById(p.getMessage()).getDateTime().format(formatter) + "]";
-            exportedMsg += " " + userRepository.getUserById(p.getSenderUser()).get().getFullName() + ":";
-            exportedMsg += " " + messageRepository.findById(p.getMessage()).getContent() + " \n";
+            exportedMsg.append("[").append(messageRepository.findById(p.getMessage()).getDateTime().format(formatter)).append("]");
+            exportedMsg.append(" ").append(userRepository.getUserById(p.getSenderUser()).get().getFullName()).append(":");
+            exportedMsg.append(" ").append(messageRepository.findById(p.getMessage()).getContent()).append(" \n");
         }
 
-        return exportedMsg; // need to remove response handlers
+        return exportedMsg.toString(); // need to remove response handlers
     }
 
+    /**
+     * method that responsible for exports group chat
+     * @param groupName
+     * @return string that contains all formatted messages
+     */
     public String exportPublicMessages(String groupName) {
 
         Optional<PublicGroups> byGroupName = groupRepository.findByGroupName(groupName);
@@ -135,7 +173,6 @@ public class ChatService {
         List<GroupMembers> members = groupMembersRepository.findByGroupId(groupId);
         List<Integer> membersIds = groupMembersRepository.findByGroupId(groupId).stream().map(GroupMembers::getUserId).collect(Collectors.toList());
 
-        String exportedGroupChats = "";
         List<GroupChats> gc = new ArrayList<>();
         for (int id : membersIds) {
 
@@ -146,16 +183,22 @@ public class ChatService {
         List<GroupChats> sortedGroupChats = gc.stream().sorted(this::compareGroupChat).collect(Collectors.toList());
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 
+        StringBuilder exportedGroupChats = new StringBuilder();
         for (GroupChats groupChat : sortedGroupChats) {
 
-            exportedGroupChats += "[" + messageRepository.findById(groupChat.getMessage()).getDateTime().format(formatter) + "]";
-            exportedGroupChats += " " + userRepository.getUserById(groupChat.getSenderUser()).get().getFullName() + ":";
-            exportedGroupChats += " " + messageRepository.findById(groupChat.getMessage()).getContent() + " \n";
+            exportedGroupChats.append("[").append(messageRepository.findById(groupChat.getMessage()).getDateTime().format(formatter)).append("]");
+            exportedGroupChats.append(" ").append(userRepository.getUserById(groupChat.getSenderUser()).get().getFullName()).append(":");
+            exportedGroupChats.append(" ").append(messageRepository.findById(groupChat.getMessage()).getContent()).append(" \n");
         }
 
-        return exportedGroupChats; // need to remove response handlers
+        return exportedGroupChats.toString(); // need to remove response handlers
     }
 
+    /**
+     * method that responsible for fetching private chats for specific user id
+     * @param id
+     * @return private chats
+     */
     public List<User> getPrivateChats(int id) {
         List<Integer> privateChats = privateChatRepository.findPrivateChats(id);
         List<User> users = new ArrayList<>();
@@ -167,14 +210,33 @@ public class ChatService {
         return users;
     }
 
+    /**
+     * method that responsible for compering two PrivateChats
+     * @param p1
+     * @param p2
+     * @return positive number if p1 greater then p2 , 0 if p1 equals p2 and -1 if p2 greater then p1
+     */
     public int comparePrivateChat(PrivateChat p1, PrivateChat p2) {
         return messageRepository.findById(p1.getMessage()).compareTo(messageRepository.findById(p2.getMessage()));
     }
 
+    /**
+     * method that responsible for compering two GroupChats
+     * @param g1
+     * @param g2
+     * @return positive number if g1 greater then g2 , 0 if g1 equals g2 and -1 if g2 greater then g1
+     */
     public int compareGroupChat(GroupChats g1, GroupChats g2) {
         return messageRepository.findById(g1.getMessage()).compareTo(messageRepository.findById(g2.getMessage()));
     }
 
+    /**
+     * method that responsible for compering two GroupMembers by member role
+     * @param m1
+     * @param m2
+     * @return positive number if m1.getRole() greater then m2.getRole() , 0 if m1.getRole() equals m2.getRole()
+     *                         and -1 if m2.getRole() greater then m1.getRole()
+     */
     public int compareGroupMembers(GroupMembers m1, GroupMembers m2) {
 
         Optional<User> user1 = userRepository.getUserById(m1.getUserId());
@@ -182,6 +244,12 @@ public class ChatService {
         return user2.get().getRole().compareTo(user1.get().getRole());
     }
 
+
+    /**
+     * method that responsible for finding GroupChat by group name par
+     * @param groupName
+     * @return GroupChat if exits
+     */
     public Optional<PublicGroups> findGroupChatByName(String groupName) {
         return groupRepository.findByGroupName(groupName);
     }

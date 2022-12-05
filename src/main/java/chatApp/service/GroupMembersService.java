@@ -19,11 +19,21 @@ public class GroupMembersService {
     private GroupRepository groupRepository;
 
 
+    /**
+     * method that responsible for adding a user to group
+     * @param userId -
+     * @param groupName -
+     */
     public void joinToGroup(int userId, String groupName) {
         PublicGroups groupChatByName = findGroupChatByName(groupName);
         groupMembersRepository.save(new GroupMembers(groupChatByName.getId(), userId));
     }
 
+    /**
+     * method that responsible for finding group by group name
+     * @param groupName -
+     * @return  group if exits
+     */
     public PublicGroups findGroupChatByName(String groupName) {
         Optional<PublicGroups> group = groupRepository.findByGroupName(groupName);
         if(group.isEmpty()) {

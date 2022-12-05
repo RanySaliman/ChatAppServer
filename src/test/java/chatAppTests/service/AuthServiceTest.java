@@ -7,15 +7,24 @@ import chatApp.repository.ConfirmationTokenRepository;
 import chatApp.repository.UserRepository;
 import chatApp.service.AuthService;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
+import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
+import javax.transaction.Transactional;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+
+
+@RunWith(SpringJUnit4ClassRunner.class)
+@SpringBootTest
 class AuthServiceTest {
 
     @Autowired
